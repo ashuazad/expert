@@ -1,0 +1,496 @@
+/* Search Code */
+var baseUrl = 'https://www.advanceinstitute.co.in';
+var records = new Object();
+var addInsentive = 0;
+var currentTime = new Date().getTime();
+var recordId = null;
+var recordRegno = null;
+var params={};
+var pageInfo={};
+var noOfrows = 0;
+var noOfpgs=0;
+var pageNo = 1;
+var admStatus = {};
+var leadsRecords={};
+var closeButtonHtml = '<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">×</span> </button>';
+var isRemark = true;
+var api_Allpending = baseUrl + '/ajax/getAccDueFees.php?_=' + currentTime;
+var lastFollowUpId = null;
+
+function setStatus(data)
+{
+    $(".todayPendingCount").text(data.TODAY_PENDING);
+    $(".allPendingCount").text(data.ALL_PENDING);
+    $(".todayDoneCount").text(data.TODAY_DONE);
+    $(".todayNewCount").text(data.TODAY_NEW);
+    $(".allStatusCount").text(data.ALL_STATUS);
+}
+
+function loadTab(){
+    $(".nav-link").each(function (){
+       if($(this).hasClass( "active" )){
+           $(this).trigger("click");
+       }
+    });
+}
+
+function getColumnDefinition(gridInfo)
+{
+    var definition = {};
+    if (gridInfo == 'todaydone') {
+        definition = { name: "last_followup_date", title: "Followup Date", type: "text", width: 120 }
+    } else {
+        definition = { name: "last_fees_date", title: "Last Receipt", type: "text", width: 120 }
+    }
+    return definition;
+}
+
+function setLeadFollowupsHeading(data)
+{
+    $('.lead-name').html(data.name);
+    $('.lead-phone').html(data.phone);
+    $('.lead-emailId').html(data.email);
+    $('.lead-Ip').html(data.ip);
+    $('.lead-course').html(data.category);
+    $('.lead-address').html(data.address);
+}
+
+function setIpLocation(data)
+{
+    $('.lead-Ip-City').html(data.city);
+    $('.lead-Ip-Country').html(data.country);
+}
+
+function getIpLocation(ip)
+{
+    $.ajax({
+        url: baseUrl + '/ajax/getIPLocation.php?_=' + currentTime,
+        type : 'POST',
+        contentType : 'application/json',
+        dataType:'json',
+        data : JSON.stringify({"ip":ip}),
+        success : function(data){
+            console.log(data);
+            setIpLocation(data);
+        }
+    });
+}
+
+function renderGrid(elementSel, gridInfo){
+    var testGrid = $(elementSel).jsGrid({
+        height: "auto",
+        width: "100%",
+        filtering: true,
+        sorting: true,
+        paging: true,
+        autoload: !0,
+        pageSize: 50,
+        pageButtonCount: 5,
+        deleteConfirm: "Do you really want to delete client?",
+        rowClass: function (item, itemIndex){ return '';},
+        controller: {
+            loadData: function(filter) {
+                return $.ajax({
+                    url: baseUrl + '/ajax/getAccLeads.php?_=' + currentTime + '&param=' + gridInfo,
+                    dataType:'json',
+                    data : filter
+                });
+            }
+        },
+        fields:getGridColumns(gridInfo)
+    });
+}
+
+function getFollowupData(aId)
+{
+    var data = {};
+    data.remark = $(".followup-remarks").children("option:selected").val();
+    data.message = (isRemark)?$(".followup-remarks").children("option:selected").val():$(".followup-message").val();
+    data.next_followup_date = $(".followup-date").val();
+    data.status = $(".followup-status").val();
+    data.id = aId;
+    return data;
+}
+
+function saveFollowup( data ){
+    data['pid'] = lastFollowUpId;
+    $.ajax({
+        url: baseUrl + '/ajax/addLeadFollowup.php?_=' + currentTime,
+        type : 'POST',
+        contentType : 'application/json',
+        dataType:'json',
+        data : JSON.stringify(data),
+        success : function( data ){
+            if(!data.success){
+                displayError(data.errors, '.display-errors');
+            }
+            if(data.success){
+               // getFollowupHistory( data.regno, 3, '.last-followups')
+                clearfollowupForm();
+                displaySuccessMsg('Followup successfully done.','.display-success');
+                displaySuccessMsgToast('Followup', 'Followup has been successfully done.')
+                clearErrors('.display-errors');
+                closeFollowupBox();
+                loadTab();
+                getLeadStatus();
+            }
+        }
+    });
+}
+
+function getLeadStatus()
+{
+    $.ajax({
+        url: baseUrl + '/ajax/getAccLeadsStatus.php?_=' + currentTime,
+        type : 'GET',
+        contentType : 'application/json',
+        dataType:'json',
+        success : function(data){
+           console.log(data);
+           setStatus(data);
+        }
+    });
+}
+
+function getLeadFollowupStatus(){
+    $.ajax({
+        url: baseUrl + '/ajax/getLeadStatus.php?_=' + currentTime,
+        type : 'POST',
+        contentType : 'application/json',
+        dataType:'json',
+        success : function( data ){
+            renderStatus(data);
+        }
+    });
+}
+
+function items(item)
+{
+    var itemsList = Array();
+    itemsList['name'] = { name: "name", title: "Name", type: "text", width: 100, cellRenderer : function (value, item) {
+            leadsRecords[item.id] =item;
+            var tdInner = '';
+            tdInner = '<td><span class="followupAdm" id="name-'+item.id+'" data-row="'+item.id+'" style="cursor:pointer;" data-toggle="modal" data-target="#grid-modal">'+item.name+'</span></td>';
+            return tdInner;
+        }, css :"gird-cell-text-alignment" };
+    itemsList['phone'] = { name: "phone", title: "Phone", type: "text", width: 100, cellRenderer:function (value, item) {
+            var phoneText = value[0]+value[1]+'*****'+value[value.length-3]+value[value.length-2]+value[value.length-1];
+            return '<td>' + phoneText + '</td>';
+        }, css :"gird-cell-text-alignment"};
+    itemsList['message'] = { name: "message", title: "Remark", type: "text", width: 140, cellRenderer:function (value, item) {
+            var moretxtRemark = (item.message.length>22)?'...':'';
+            var toltipAttr = 'data-toggle="tooltip" data-placement="top" title="'+item.message+'"';
+            return  '<td><a class="followupHistry" data-row="'+item.id+'" href="javascript:void(0)" data-toggle="modal" data-target="#grid-modal-followups"'+toltipAttr+'>'+item.message.substring(0,22)+moretxtRemark+'</a></td>';
+        }, css :"gird-cell-text-alignment"
+    };
+    itemsList['last_follow_up'] = { name: "last_follow_up", title: "Last Calling", type: "text", width: 100, css :"gird-cell-text-alignment" };
+    itemsList['next_followup_date'] = { name: "next_followup_date", title: "Next Calling", type: "text", width: 60, css :"gird-cell-text-alignment" };
+    itemsList['status'] = { name: "status", title: "Status", type: "text", width: 60, css :"gird-cell-text-alignment" };
+    itemsList['email'] = { name: "email", title: "Email", type: "text", width: 100, cellRenderer : function (value, item) {
+        return '<td id="email-'+item.id+'" >'+value+'</td>';
+        }, css :"gird-cell-text-alignment"};
+    itemsList['course'] = { name: "category", title: "Course", type: "text", width: 140, cellRenderer : function (value, item) {
+            return '<td id="course-'+item.id+'" >'+value+'</td>';
+        }, css :"gird-cell-text-alignment" };
+    return itemsList[item];
+}
+
+function tabItems(tab)
+{
+    var tabItemsList = Array();
+    tabItemsList['todaypending'] = ['name','phone','message','status','last_follow_up','next_followup_date'];
+    tabItemsList['allpending'] = ['name','phone','course','message','status','last_follow_up','next_followup_date'];
+    tabItemsList['todaynew'] = ['name','phone','course','last_follow_up','next_followup_date'];
+    tabItemsList['todaydone'] = ['name','phone','course','message','status','last_follow_up','next_followup_date'];
+    tabItemsList['allStatus'] = ['name','phone','course','message','status','last_follow_up','next_followup_date'];
+    return tabItemsList[tab];
+}
+
+function getGridColumns(tabName){
+    var itemList = tabItems(tabName);
+    var itemLen = itemList.length;
+    var objColumns = new Object();
+    for(var i=0;i<itemLen;i++){
+        objColumns[i] = items(itemList[i]);
+    }
+    //Control Column
+    objColumns[i] = {
+        type: "control",cellRenderer : function (value, item) {
+            var tdInner = '<td></td>';
+            return tdInner;
+        },
+        width: 10
+    };
+    return objColumns;
+}
+
+function getLeadFollowupHistory(leadId, saveFlag = 0, elementId){
+    var norows = '';
+    norows = (saveFlag > 0)? '&r=3' : '';
+    $.ajax({
+        url: baseUrl + '/ajax/getLeadFollowups.php?_=' + currentTime + norows,
+        type : 'POST',
+        contentType : 'application/json',
+        dataType:'json',
+        data : JSON.stringify({"leadId":leadId}),
+        success : function( data ){
+            lastFollowUpId = data[0].id
+            renderFollowups(data, elementId);
+        }
+    });
+}
+
+function getLeadRemarkMsg()
+{
+    $.ajax({
+        url: baseUrl + '/ajax/getLeadRemark.php?_=' + currentTime,
+        type : 'POST',
+        contentType : 'application/json',
+        dataType:'json',
+        success : function( data ){
+            renderRemark(data);
+        }
+    });
+}
+
+//Lead Edit
+function enableEditField()
+{
+    $('.lead-edit .controls').show('fast');
+    $('.lead-edit-row').hide('fast');
+    $('.lead-save-button').show('fast');
+    $('.lead-edit-button').hide('fast');
+}
+
+function disableEditField()
+{
+    $('.lead-edit .controls').hide('fast');
+    $('.lead-edit-row').show('fast');
+    $('.lead-save-button').hide('fast');
+    $('.lead-edit-button').show('fast');
+}
+
+function setEditFields()
+{
+    $(".lead-edit-row").each(function (){
+        $(this).siblings(".controls").children("input").val($(this).text())
+    });
+}
+
+function getEditFieldData()
+{
+    var leadEditData = new Object();
+    $(".lead-edit-row").each(function (){
+        leadEditData[$(this).siblings(".controls").children("input").attr('name')] = $(this).siblings(".controls").children("input").val();
+    });
+    return leadEditData;
+}
+
+function updateLead(data, id)
+{
+    data['id'] = id;
+    $.ajax({
+        url: baseUrl + '/ajax/updateAccLead.php?_=' + currentTime,
+        type : 'POST',
+        contentType : 'application/json',
+        dataType:'json',
+        data:JSON.stringify(data),
+        success : function( data ){
+            console.log(data);
+            if (data.success) {
+                updateLeadDataStore(data.data);
+                updateRow(data.data);
+                setLeadFollowupsHeading(leadsRecords[data.data.id]);
+            }
+        }
+    });
+}
+
+function updateLeadDataStore(data)
+{
+    leadsRecords[data.id]['name'] = data.name;
+    leadsRecords[data.id]['category'] = data.category;
+    leadsRecords[data.id]['email'] = data.email;
+    leadsRecords[data.id]['address'] = data.address;
+}
+
+function updateRow(data)
+{
+    $("#name-"+data.id).text(data.name);
+    $("#email-"+data.id).text(data.email);
+    $("#course-"+data.id).text(data.category);
+    $("#address-"+data.id).text(data.address);
+}
+
+function clearEditFields()
+{
+    $(".lead-edit-row").each(function (){
+        $(this).siblings(".controls").children("input").val('');
+    });
+}
+//Lead Edit
+// Set Income Status Start
+function setIncomeStatus(data)
+{
+    $(".total-income").text(data.totalSalary);
+}
+
+function setIncentiveStatus(data)
+{
+    $(".approve-incentive").text(data.APPROVED);
+    $(".pending-incentive").text(data.PENDING);
+}
+
+function getIncomeStatus()
+{
+    $.ajax({
+        url: baseUrl + '/ajax/getSalary.php?_=' + currentTime,
+        type : 'GET',
+        contentType : 'application/json',
+        dataType:'json',
+        success : function(data){
+            setIncomeStatus(data);
+        }
+    });
+    $.ajax({
+        url: baseUrl + '/ajax/getAccIncentiveStatus.php?_=' + currentTime,
+        type : 'GET',
+        contentType : 'application/json',
+        dataType:'json',
+        success : function(data){
+            setIncentiveStatus(data);
+        }
+    });
+}
+// Set Income Status End
+
+// Create Lead Start
+function getLeadData(currentObj)
+{
+   var returnData = {};
+   var formData = $(currentObj).serializeArray();
+   for(var i=0;i<formData.length;i++){
+       returnData[formData[i].name] = formData[i].value;
+   }
+   return returnData;
+}
+function createLead(data)
+{
+    $.ajax({
+        url: baseUrl + '/ajax/addLeadV2.php?_=' + currentTime,
+        type : 'POST',
+        contentType : 'application/json',
+        dataType:'json',
+        data:JSON.stringify(data),
+        success : function( data ){
+            console.log(data);
+            if (data.success) {
+                getLeadStatus();
+                getLeadFollowupStatus();
+                renderGrid('.todayPendingGrid', 'todaypending');
+                displaySuccessMsg('Lead Created Successfully.','.display-success');
+                displaySuccessMsgToast('Lead', 'Lead Created Successfully.')
+            }
+        }
+    });
+}
+// Create Lead End
+
+// Courses Start
+function renderCourses(data, element)
+{
+    var selectOprions='<option value="">Select Course</option>';
+    for(var i=0; i<data.length;i++){
+        selectOprions+='<option value="'+data[i].course+'">'+data[i].course.replaceAll('-',' ')+'</option>';
+    }
+    $(element).html(selectOprions);
+}
+
+function getCourses()
+{
+    $.ajax({
+        url: baseUrl + '/ajax/getCourses.php?_=' + currentTime,
+        type : 'GET',
+        contentType : 'application/json',
+        dataType:'json',
+        success : function(data){
+            renderCourses(data, '.lead-courses');
+        }
+    });
+}
+// Courses End
+
+/// Default Load Start ///
+getLeadStatus();
+getIncomeStatus();
+getLeadFollowupStatus();
+getLeadRemarkMsg();
+renderGrid('.todayPendingGrid', 'todaypending');
+getCourses();
+/// Default Load End ///
+
+$("#createLeadForm").submit(function(event) {
+    console.log("createLeadForm");
+    createLead(getLeadData(this));
+    $("#grid-modal-newLead").modal('toggle');
+    //return false;
+    event.preventDefault();
+});
+/// Default Load ///
+
+$("body").on('click', ".todayPendingNav", function (){
+    renderGrid('.todayPendingGrid', 'todaypending');
+});
+
+$("body").on('click', ".allPendingNav", function (){
+    renderGrid('.allPendingGrid', 'allpending');
+});
+
+$("body").on('click', ".todayNewNav", function (){
+    renderGrid('.todayNewGrid', 'todaynew');
+});
+
+$("body").on('click', ".todayDoneNav", function (){
+    renderGrid('.todayDoneGrid', 'todaydone');
+});
+
+$("body").on('click', ".allStatusNav", function (){
+    renderGrid('.allStatusGrid', 'allStatus');
+});
+
+$("body").on("click", ".followupAdm", function(){
+    resetFollowupsHeading();
+    clearfollowupForm();
+    clearSuccessMsg('.display-success');
+    clearErrors('.display-errors');
+    clearFollowups('.last-followups');
+    //recordRegno = $(this).attr("data-regno");
+    recordId = $(this).attr("data-row");
+    setLeadFollowupsHeading(leadsRecords[recordId]);
+    getIpLocation(leadsRecords[recordId].ip);
+    getLeadFollowupHistory(recordId, 3, '.last-followups');
+});
+
+$("body").on("click", ".followupHistry", function(){
+    var LeadId = $(this).attr("data-row");
+    //getFollowupHistory(recordRegno, 0, '.all-followups');
+    getLeadFollowupHistory(LeadId, 0, '.all-followups');
+});
+
+$("#saveFollowup").click(function(){
+    saveFollowup(getFollowupData(recordId));
+});
+
+$('.lead-edit-button').click(function (){
+    setEditFields();
+    enableEditField();
+});
+
+$('.lead-save-button').click(function (){
+    disableEditField();
+    updateLead(getEditFieldData(),recordId);
+});
+
+function printReciept(fId){
+    window.open(baseUrl + "/account/scriptrecpt/index.php?f_id="+fId, "Recept", "width=1100 height=900");
+}
