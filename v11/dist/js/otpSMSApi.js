@@ -17,6 +17,10 @@ let branchList = {};
 let apiList = {};
 let currentEmp;
 
+import getCommon from "./common";
+
+let commons = getCommon();
+
 const alertMessage = (data) => {
     $.toast({
         heading: data.heading,
@@ -100,7 +104,7 @@ const renderGrid = (elementSel, filterOpt='') => {
         controller: {
             loadData: function(filter) {
                 return $.ajax({
-                    url: baseUrl + '/ajax/'+ api +'?_=' + currentTime + '&' + filterOpt,
+                    url: baseUrl + '/ajax/'+ api +'?_=' + currentTime + '&type=' + commons.comm_api_url_type + '&' + filterOpt ,
                     dataType:'json',
                     data : filter,
                     success : function (data) {
@@ -211,6 +215,7 @@ const getAPIAddData = () => {
     data['api'] = $('.add-api-url').val();
     data['className'] = $('.add-api-class').val();
     data['status'] = (SwitcheryObjAdd.isChecked())?'1':'0';
+    data['type'] = (commons.comm_api_url_type)?commons.comm_api_url_type:'LOGIN_OTP';
     return data;
 }
 $("#addAPI").click(function () {
