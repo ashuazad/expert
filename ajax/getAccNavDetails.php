@@ -14,31 +14,68 @@ $categoryObj = new categoryDatabase();
 $user_query = new userqueryDatabase();
 $manage_branchObj = new managebranchDatabase();
 $dbObj = new db();
+if ($id == '1') {
+    $arr_nav = array(
+        array(
+            "link" => "/v11/superadmin/userDueFees.php",
+            "icon" => "icon-speedometer",
+            "name" => "Due Fees"
+        ),
+        array(
+            "link" => "/v11/superadmin/offerStatus.php",
+            "icon" => "icon-speedometer",
+            "name" => "Special Offers"
+        ),
+        array(
+            "link" => "/v11/superadmin/otpSMSApi.php?type=login",
+            "icon" => "icon-user",
+            "name" => "LOGIN OTP API"
+            ),
+        array(
+            "link" => "/v11/superadmin/otpSMSApi.php?type=due",
+            "icon" => "ti-clipboard",
+            "name" => "DUE OTP API"
+        ),
+        array(
+            "link" => "/v11/superadmin/smsTemplate.php?type=due",
+            "icon" => "ti-clipboard",
+            "name" => "Due SMS Template"
+        ),
+        array(
+            "link" => "/v11/superadmin/userPermission.php",
+            "icon" => "icon-user",
+            "name" => "User Permission"
+        )
+    );
+    $login_user = 'Super Admin';
+} else {
+    $loginUser = $dbObj->getData(array("CONCAT(first_name, last_name) AS Name"),"login_accounts", "id='".$id."'");
+    $login_user = $loginUser[1]['Name'];
+$arr_nav = array(
+    array(
+        "link" => "/v11/userLeads.php",
+        "icon" => "icon-speedometer",
+        "name" => "Dashboard"
+    ),
+    array(
+        "link" => "/v11/userAdmission.php",
+        "icon" => "icon-user",
+        "name" => "Admissions"
+        ),
+    array(
+        "link" => "/v11/userDueFees.php",
+        "icon" => "ti-clipboard",
+        "name" => "Due Fees"
+    ),
+    array(
+        "link" => "/v11/userIncentive.php",
+        "icon" => "ti-clipboard",
+        "name" => "Incentive"
+    )
+);
+}
 $data = array(
-            "login_user"=>"None",
-            "nav" => array(
-                            array(
-                                "link" => "/v11/userLeads.php",
-                                "icon" => "icon-speedometer",
-                                "name" => "Dashboard"
-                            ),
-                            array(
-                                "link" => "/v11/userAdmission.php",
-                                "icon" => "icon-user",
-                                "name" => "Admissions"
-                                ),
-                            array(
-                                "link" => "/v11/userDueFees.php",
-                                "icon" => "ti-clipboard",
-                                "name" => "Due Fees"
-                            ),
-                            array(
-                                "link" => "/v11/userIncentive.php",
-                                "icon" => "ti-clipboard",
-                                "name" => "Incentive"
-                            )
-                        )
+            "login_user" => $login_user,
+            "nav" => $arr_nav
             );
-$loginUser = $dbObj->getData(array("CONCAT(first_name, last_name) AS Name"),"login_accounts", "id='".$id."'");
-$data['login_user'] = $loginUser[1]['Name'];
 echo json_encode($data);

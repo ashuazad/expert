@@ -1,0 +1,24 @@
+[24-Nov-2015 20:02:47 UTC] PHP Fatal error:  Class 'db' not found in /home/experticitystart/public_html/includes/fee.php on line 2
+[24-Nov-2015 20:04:46 UTC] PHP Warning:  constant(): Couldn't find constant BASE_URL in /home/experticitystart/public_html/includes/emp_header.php on line 22
+[24-Nov-2015 20:04:46 UTC] PHP Warning:  constant(): Couldn't find constant BASE_URL in /home/experticitystart/public_html/includes/emp_header.php on line 35
+[24-Nov-2015 20:04:46 UTC] PHP Warning:  constant(): Couldn't find constant BASE_URL in /home/experticitystart/public_html/includes/emp_header.php on line 93
+[28-Nov-2015 17:43:14 UTC] PHP Warning:  mysql_query(): Access denied for user 'experticitystart'@'localhost' (using password: NO) in /home/experticitystart/public_html/includes/header.php on line 152
+[28-Nov-2015 17:43:14 UTC] PHP Warning:  mysql_query(): A link to the server could not be established in /home/experticitystart/public_html/includes/header.php on line 152
+[28-Nov-2015 17:43:14 UTC] PHP Warning:  mysql_fetch_array() expects parameter 1 to be resource, boolean given in /home/experticitystart/public_html/includes/header.php on line 153
+[28-Nov-2015 17:43:14 UTC] PHP Warning:  mysql_query(): Access denied for user 'experticitystart'@'localhost' (using password: NO) in /home/experticitystart/public_html/includes/header.php on line 167
+[28-Nov-2015 17:43:14 UTC] PHP Warning:  mysql_query(): A link to the server could not be established in /home/experticitystart/public_html/includes/header.php on line 167
+[28-Nov-2015 17:43:14 UTC] PHP Warning:  mysql_fetch_array() expects parameter 1 to be resource, boolean given in /home/experticitystart/public_html/includes/header.php on line 168
+[28-Nov-2015 17:43:14 UTC] PHP Warning:  mysql_query(): Access denied for user 'experticitystart'@'localhost' (using password: NO) in /home/experticitystart/public_html/includes/header.php on line 182
+[28-Nov-2015 17:43:14 UTC] PHP Warning:  mysql_query(): A link to the server could not be established in /home/experticitystart/public_html/includes/header.php on line 182
+[28-Nov-2015 17:43:14 UTC] PHP Warning:  mysql_fetch_array() expects parameter 1 to be resource, boolean given in /home/experticitystart/public_html/includes/header.php on line 183
+[28-Nov-2015 17:43:14 UTC] PHP Fatal error:  Call to a member function getData() on a non-object in /home/experticitystart/public_html/includes/header.php on line 219
+[28-Nov-2015 18:00:07 UTC] PHP Warning:  mysql_query(): Access denied for user 'experticitystart'@'localhost' (using password: NO) in /home/experticitystart/public_html/includes/header.php on line 152
+[28-Nov-2015 18:00:07 UTC] PHP Warning:  mysql_query(): A link to the server could not be established in /home/experticitystart/public_html/includes/header.php on line 152
+[28-Nov-2015 18:00:07 UTC] PHP Warning:  mysql_fetch_array() expects parameter 1 to be resource, boolean given in /home/experticitystart/public_html/includes/header.php on line 153
+[28-Nov-2015 18:00:07 UTC] PHP Warning:  mysql_query(): Access denied for user 'experticitystart'@'localhost' (using password: NO) in /home/experticitystart/public_html/includes/header.php on line 167
+[28-Nov-2015 18:00:07 UTC] PHP Warning:  mysql_query(): A link to the server could not be established in /home/experticitystart/public_html/includes/header.php on line 167
+[28-Nov-2015 18:00:07 UTC] PHP Warning:  mysql_fetch_array() expects parameter 1 to be resource, boolean given in /home/experticitystart/public_html/includes/header.php on line 168
+[28-Nov-2015 18:00:07 UTC] PHP Warning:  mysql_query(): Access denied for user 'experticitystart'@'localhost' (using password: NO) in /home/experticitystart/public_html/includes/header.php on line 182
+[28-Nov-2015 18:00:07 UTC] PHP Warning:  mysql_query(): A link to the server could not be established in /home/experticitystart/public_html/includes/header.php on line 182
+[28-Nov-2015 18:00:07 UTC] PHP Warning:  mysql_fetch_array() expects parameter 1 to be resource, boolean given in /home/experticitystart/public_html/includes/header.php on line 183
+[28-Nov-2015 18:00:07 UTC] PHP Fatal error:  Call to a member function getData() on a non-object in /home/experticitystart/public_html/includes/header.php on line 219

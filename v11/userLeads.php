@@ -4,6 +4,8 @@ if (!$_SESSION['id']) {
     header('Location: https://www.advanceinstitute.co.in');
     exit;
 }
+//print_r($_SESSION);
+//exit();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,6 +27,9 @@ if (!$_SESSION['id']) {
     <!-- Editable CSS -->
     <link type="text/css" rel="stylesheet" href="assets/node_modules/jsgrid/jsgrid.min.css" />
     <link type="text/css" rel="stylesheet" href="assets/node_modules/jsgrid/jsgrid-theme.min.css" />
+    <!-- multi select css -->
+    <link href="assets/node_modules/select2/dist/css/select2.min.css" rel="stylesheet" type="text/css" />
+    <link href="assets/node_modules/bootstrap-select/bootstrap-select.min.css" rel="stylesheet" />
     <!-- Custom CSS -->
     <link href="dist/css/style.css" rel="stylesheet">
     <link href="dist/css/custom.css" rel="stylesheet">
@@ -584,7 +589,8 @@ if (!$_SESSION['id']) {
                                                 <div class="controls">
                                                     <input type="text" class="form-control lead-name-field" name="name">
                                                 </div>
-                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                                <button type="button" class="btn btn-dark quotation-button" data-toggle="tab" href="#quotation" role="tab">Send PDF</button>
+                                                <button type="button" class="close" style="margin-left:2rem" data-dismiss="modal" aria-hidden="true">×</button>
                                             </div>
                                             <div class="modal-header">
                                                 <div class="col-md">
@@ -644,6 +650,7 @@ if (!$_SESSION['id']) {
                                                 </div>
                                                 <ul class="nav nav-tabs" role="tablist">
                                                     <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#messages" role="tab"><span class="hidden-sm-up"><i class="ti-email"></i></span> <span class="hidden-xs-down">Follow Up</span></a> </li>
+                                                    <li class="nav-item"> <a class="nav-link quotation-tab" data-toggle="tab" href="#quotation" role="tab"><span class="hidden-sm-up"><i class="ti-notepad"></i></span> <span class="hidden-xs-down">Special Offer Send</span></a> </li>
                                                 </ul>
                                                 <!-- Tab panes -->
                                                 <div class="tab-content tabcontent-border">
@@ -676,7 +683,7 @@ if (!$_SESSION['id']) {
                                                                         <div class="form-group">
                                                                             <h5>Next Followup Date <span class="text-danger">*</span></h5>
                                                                             <div class="controls">
-                                                                                <input type="date" name="text" class="form-control followup-date" required data-validation-required-message="This field is required"> </div>
+                                                                                <input type="date" name="text" class="form-control followup-date custom-date" required data-validation-required-message="This field is required"> </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>    
@@ -701,6 +708,56 @@ if (!$_SESSION['id']) {
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <div class="tab-pane" id="quotation" role="tabpanel">
+                                                        <div class="card-body">
+                                                            <div class="quotation-form">
+                                                                <form method="POST" id="quotation-pdf" action="quotationPdf.php" target="_blank">
+                                                                    <strong>Courses</strong>
+                                                                    <br>     
+                                                                    <div class="controls">
+                                                                        <select name="courses[]" class="form-control select2 m-b-10 select2-multiple courses-quotation" multiple="multiple" data-placeholder="Choose" required style="width: 100%">
+                                                                            <option value="">-Select-</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <strong>Course Fees</strong>
+                                                                    <br>     
+                                                                    <div class="controls">
+                                                                        <input type="text" class="form-control" id="course_fee" name="course_fee" readonly  value="" Placeholder="Course Packege"/>
+                                                                    </div>
+                                                                    <strong>Total Fees</strong>
+                                                                    <br>     
+                                                                    <div class="controls">
+                                                                        <input type="text" class="form-control" id="total_fee" name="total_fee" value="" class='inpTxt' Placeholder="Total Fee" readonly  required/>
+                                                                    </div>
+                                                                    <strong>Discount</strong>
+                                                                    <br>     
+                                                                    <div class="controls">
+                                                                        <input type='text' class="form-control" id="disAmt" name="disAmt" Placeholder="Discount" <?php echo (($_SESSION['user_permission']['emp_set_discount']==1) || ($_SESSION['USER_TYPE'] == 'SUPERADMIN')) ? 'on':'readonly'?>> 
+                                                                    </div>
+                                                                    <br>
+                                                                    <input type="hidden" id="quotation_lead_id" name="lead_id" value="">
+                                                                    <input type="hidden" id="quotation_lead_name" name="lead_name" value="">
+                                                                    <input type="hidden" id="quotation_lead_phone" name="lead_phone" value="">
+                                                                    <input type="hidden" id="quotation_isEdited" name="quotation_isEdited" value="0">
+                                                                    <div class="text-center">
+                                                                        <button class="btn btn-info" type="submit">Generate PDF</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>    
+                                                                <br>
+                                                                <div class="quotation-history">
+                                                                    <table class="table full-color-table full-danger-table hover-table">
+                                                                        <thead>
+                                                                        <tr><th>Date</th><th>Courses</th><th>Price</th><th>Discount</th><th>Offer Price</th><th>User</th><th>Status</th><th></th></tr>
+                                                                        </thead>
+                                                                        <tbody id="currentQuotationTable">
+                                                                            <tr><td colspan="6">NONE</td></tr>
+                                                                        </tbody>
+                                                                    </table> 
+                                                                </div>
+                                                                
+                                                        </div>
+                                                    </div>                                                        
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
@@ -890,7 +947,7 @@ if (!$_SESSION['id']) {
                                                                 <div class="form-group">
                                                                     <h5>Next Followup Date <span class="text-danger">*</span></h5>
                                                                     <div class="controls">
-                                                                        <input type="date" name="text" class="form-control due-fees-followup-date" required data-validation-required-message="This field is required"> </div>
+                                                                        <input type="date" name="text" class="form-control due-fees-followup-date custom-date" required data-validation-required-message="This field is required"> </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1089,6 +1146,7 @@ if (!$_SESSION['id']) {
     <script src="assets/node_modules/gauge/gauge.min.js"></script>
     <script src="dist/js/pages/widget-data-due-fees.js?_=<?php echo time();?>"></script>
     <script src="assets/node_modules/toast-master/js/jquery.toast.js"></script>
+    <script src="assets/node_modules/select2/dist/js/select2.full.min.js" type="text/javascript"></script>
     <script src="dist/js/accNavDetails.js?_=<?php echo time();?>"></script>
     <script src="dist/js/common.js?_=<?php echo time();?>"></script>
     <script src="dist/js/pages/validation.js"></script>

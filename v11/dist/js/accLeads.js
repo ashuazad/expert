@@ -55,6 +55,9 @@ function setLeadFollowupsHeading(data)
     $('.lead-Ip').html(data.ip);
     $('.lead-course').html(data.category);
     $('.lead-address').html(data.address);
+    $('#quotation_lead_id').val(data.id);
+    $('#quotation_lead_name').val(data.name);
+    $('#quotation_lead_phone').val(data.phone);
 }
 
 function setIpLocation(data)
@@ -446,8 +449,140 @@ function getCourses()
     });
 }
 // Courses End
+const clearForm = () => {
+    $('.form-control').each(function () {
+        if ($(this).prop("tagName") === 'select') {
+            $(this).children('option').each(function () {
+                $(this).prop('selected', false)
+            })
+        }
+        $(this).val('');
+    })
+}
+
+function loadCourses(){
+    var settings = {
+        "async": false,
+        "crossDomain": true,
+        "url": baseUrl + "/api_v1/index.php/Registration/get_courses" + "?&_=" + currentTime,
+        "method": "GET",
+        "headers": {
+            "cache-control": "no-cache"
+        }
+    }
+
+    $.ajax(settings).done(function (response) {
+        var courses = JSON.parse( response );
+        var courseSelectBox = '';
+        if(courses.success == true){
+            $.each( courses.data, function( key, value ) {
+                courseSelectBox += '<option value = "'+ value.course +'" >' + value.course.replace( /-/g ,' ' ) + '</option>';
+            });
+            $(".courses-quotation").html(courseSelectBox);
+        }
+    });
+}
+
+$(".select2").change(function(){
+    var cN ='';
+       $(this).children( "option:selected").each(function(index,element){                    
+                cN =cN+$(this).val()+",";
+        });
+
+if(cN.length > 1){        
+var myObj = null;
+//alert(cN); 
+    $.ajax({
+            url : '../ajax/getCourseFee.php',
+            type : 'POST',
+            data : {course : cN },
+            success : function(data){
+            console.log(data);
+               //alert(data);
+           myObj = jQuery.parseJSON(data);
+                   $("#course_fee").val(myObj.totalMainFee);
+                   $("#total_fee").val(myObj.totalFee);
+                   $("#disAmt").val(myObj.disCountAmt);
+                   
+                    },
+           error : function(err){
+                        alert(err);
+                     }
+              });
+    
+        } 
+
+});
+//Change Discount
+$("#disAmt").change(function(){
+    $("#total_fee").val( $("#course_fee").val() - $(this).val() );
+    $('#quotation_isEdited').val('1');
+});
+// Get Lead Quotation
+const getLeadQuotation = (lead_id, leadRecords) => {
+    //var leadsRecords[recordId]
+    $.ajax({
+        url: baseUrl + '/ajax/getLeadQuotation.php?_=' + currentTime,
+        type : 'POST',
+        contentType : 'application/json',
+        dataType:'json',
+        data:JSON.stringify({lead_id:lead_id}),
+        success : function( data ){
+            //console.log(data);
+            if (data.length) {
+                leadRecords[lead_id]['quotation-history'] = data;
+                renderQuatation(data, '#currentQuotationTable');
+                $('.quotation-history').show('fast');
+            } else {
+                $('.quotation-history').hide('fast');
+            }
+            //clearForm();
+        }
+    });    
+}
+
+const renderQuatation = (quotation, elementSelector) => {
+    let data = null;
+    let tr = "<tr><td colspan='6'>NONE</td></tr>";
+    data = quotation.length?quotation[0]:null;
+    if (quotation.length) {
+        let printTd = '<td><a target="_blank" href="quotationPdf.php?id='+data.quotation_id+'"><i class="ti-printer"></i></a></td>';
+        let statusCellClass = '';
+        if (data.status == 'APPROVED') {
+            statusCellClass = 'badge-success';            
+        } else {
+            statusCellClass = 'badge-danger';
+        }
+        let statusTd = '<td><span class="badge '+statusCellClass+'">'+data.status+'</span></td>';
+        tr = "<tr><td>"+data.created_date+"</td><td>"+data.courses+"</td><td>"+data.total_price+"</td><td>"+data.discount+"</td><td>"+data.offer_price+"</td><td>"+data.first_name+"</td>"+statusTd+printTd+"</tr>";
+    }
+    $(elementSelector).html(tr);
+}
+//Get Quotation Form data
+const getQuotationFormData = () => {
+    $('#quotation-pdf')
+} 
+//PFD Button
+$('.quotation-button').click(function(){
+    $(".quotation-tab").tab('show');
+    $('.quotation-history').hide('fast');
+    $('.quotation-form').show('fast');
+});
+
+$('.quotation-tab').click(function(){
+    if (leadsRecords[recordId]['quotation-history']) {
+        $('.quotation-history').show('fast');
+        //renderQuatation(leadsRecords[recordId]['quotation-history'], '#currentQuotationTable');
+        getLeadQuotation(recordId, leadsRecords)
+    } 
+    if (!leadsRecords[recordId]['quotation-history']) {
+        getLeadQuotation(recordId, leadsRecords)
+    }
+    $('.quotation-form').show('fast');
+});
 
 /// Default Load Start ///
+//let multiSelectCoursesQuotation = null;
 getLeadStatus();
 getDueStatus('Lead');
 getIncomeStatus();
@@ -456,6 +591,10 @@ getLeadRemarkMsg();
 renderGrid('.todayPendingGrid', 'todaypending');
 getCourses();
 getFeeStatus('.due-fees-followup-status');
+$(function () {
+    $(".select2").select2();
+});
+loadCourses();
 /// Default Load End ///
 
 $("#createLeadForm").submit(function(event) {
@@ -491,6 +630,19 @@ $("body").on('click', ".allPendingNavDueFee", function (){
     renderDueFeeGrid('.allPendingDueFeeGrid', 'allpending');
 });
 
+const clearQuotationForm = () => {
+    $('#course_fee').val('');
+    $('#total_fee').val('');
+    $('#disAmt').val('');
+    //$('#quotation_lead_name').val('');
+    //$('#quotation_lead_phone').val('');
+    $('#quotation_isEdited').val('0');
+    //$('#quotation_lead_id').val('');
+    //$('').val('');
+   // multiSelectCoursesQuotation.empty();
+    $('.select2').val(null).trigger('change');
+}
+
 $("body").on("click", ".followupAdm", function(){
     disableEditField();
     clearRemark('.followup-remarks');
@@ -505,6 +657,8 @@ $("body").on("click", ".followupAdm", function(){
     setLeadFollowupsHeading(leadsRecords[recordId]);
     getIpLocation(leadsRecords[recordId]);
     getLeadFollowupHistory(recordId, 3, '.last-followups');
+   // getLeadQuotation(recordId, leadsRecords);
+    clearQuotationForm();
 });
 
 $("body").on("click", ".followupHistry", function(){

@@ -22158,3 +22158,42 @@ File: scss
  .followupAdm{
    text-decoration: underline;
  }
+
+ .quotation-button{
+  margin: -5px -1rem -1rem auto;
+ }
+
+.followup-btn-close{
+  margin-left:2rem;
+}
+ 
+.custom-date{
+  display: block !important;
+}
+
+.cust-dropdown-menu{
+  min-width: 7rem !important;
+}
+
+.cust-dropdown-item{
+  padding: .65rem 1.5rem !important;
+}
+
+.cust-filter-form-group{
+  margin-bottom: 0px !important;
+  padding-bottom: 0px !important;
+}
+
+.cust-filter-card-body{
+  padding-bottom: 0px;
+  padding-top: 0px;
+}
+
+.cust-offer-checkbox {
+    height: 16px !important;
+    width: 16px !important;
+}
+
+.no-of-records{
+  font-size: 16px;
+}

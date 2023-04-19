@@ -17,7 +17,7 @@ let branchList = {};
 let apiList = {};
 let currentEmp;
 
-import getCommon from "./common";
+import {getCommon} from "./common";
 
 let commons = getCommon();
 

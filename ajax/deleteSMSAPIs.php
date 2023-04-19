@@ -23,7 +23,7 @@ $result = array();
 $result['success'] = false;
 $result['errors'] = $errors;
 $postedData = json_decode(file_get_contents('php://input'), true);
-$id = trim($postedData['id']);
+$id = trim($postedData['ids']);
 $smsDetails = $dbObj->getData(array('1'),'sms_api', "id = '".$id."'");
 if ($smsDetails[0] == 0) {
     $errors[] = 'SMS API Not Found';
