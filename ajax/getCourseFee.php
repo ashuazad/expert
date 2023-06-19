@@ -36,7 +36,7 @@ $fee=0;
 //echo "SELECT * FROM `course_fee` where course in(".$courseSrch.")";
 $res=mysql_query("SELECT * FROM `course_fee` where course in(".$courseSrch.")" ) or die(mysql_error());
 while($dataArry=mysql_fetch_row($res)){
-$fee+=$dataArry[1];
+$fee+=$dataArry[2];
 }
 
 $discountAmt = 0;

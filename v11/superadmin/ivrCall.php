@@ -30,7 +30,7 @@ if (!isset($_SESSION['OTP_C']) && empty($_SESSION['OTP_C'])) {
     <meta name="author" content="">
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon.png">
-    <title>Special Offer Status</title>
+    <title>IVR Call Schedule</title>
     <!-- chartist CSS -->
     <link href="../assets/node_modules/chartist-js/dist/chartist.min.css" rel="stylesheet">
     <link href="../assets/node_modules/chartist-js/dist/chartist-init.css" rel="stylesheet">
@@ -42,6 +42,7 @@ if (!isset($_SESSION['OTP_C']) && empty($_SESSION['OTP_C'])) {
     <!-- Custom CSS -->
     <link href="../dist/css/style.css" rel="stylesheet">
     <!-- page css -->
+    <link href="../assets/node_modules/switchery/dist/switchery.min.css" rel="stylesheet" />
     <link href="../dist/css/pages/widget-page.css" rel="stylesheet">
     <link href="../dist/css/pages/tab-page.css" rel="stylesheet">
     <link href="../assets/node_modules/toast-master/css/jquery.toast.css" rel="stylesheet">
@@ -51,6 +52,36 @@ if (!isset($_SESSION['OTP_C']) && empty($_SESSION['OTP_C'])) {
     <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 <![endif]-->
+<style type="text/css">
+
+.circle, .circle::before {
+  content: " ";
+  margin: 15px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  margin: 0 auto;
+  transition: all 0.2s;
+  background-color: #00FF00;
+}
+
+.circle::before {
+  animation: mymove 2s infinite;
+  position: absolute;
+  background-color: #00FF00
+}
+
+@-webkit-keyframes mymove {
+  50%   {
+    transform: scale(2);
+    opacity: 0
+  }
+  100%   {
+    transform: scale(2);
+    opacity: 0
+  }
+}
+</style>
 </head>
 <body class="skin-default-dark fixed-layout">
     <!-- ============================================================== -->
@@ -250,7 +281,7 @@ if (!isset($_SESSION['OTP_C']) && empty($_SESSION['OTP_C'])) {
                 <!-- ============================================================== -->
                 <div class="row page-titles">
                     <div class="col-md-5 align-self-center">
-                        <h4 class="text-themecolor">Special Offer Status</h4>
+                        <h4 class="text-themecolor">IVR Call Schedule</h4>
                     </div>
                     <div class="col-md-7 align-self-center text-right">
                         <div class="d-flex justify-content-end align-items-center">
@@ -268,71 +299,300 @@ if (!isset($_SESSION['OTP_C']) && empty($_SESSION['OTP_C'])) {
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <span style="font-size: 20px;">Special Offers</span>
+                                <span style="font-size: 20px;">IVR Call Schedule</span>
                                 <div class="card-actions">
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="ti-settings"></i>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right cust-dropdown-menu">
-                                            <a class="dropdown-item cust-dropdown-item approve-quot" href="javascript:void(0)"><i class="fas fa-check"></i> Approve</a>
-                                            <a class="dropdown-item cust-dropdown-item dis-approve-quot" href="javascript:void(0)"><i class="fas fa-times"></i> &nbsp;Disapprove</a>
-                                            <a class="dropdown-item cust-dropdown-item delete-quot" href="javascript:void(0)"><i class="fas fa-trash"></i> &nbsp;Delete</a>
+                                            <a class="dropdown-item cust-dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#myModalAdd"><i class="fas fa-plus"></i>Add API</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <!-- Filter Start -->
                             <div class="card-body cust-filter-card-body">
-                                <div class="row">
-                                    <div class="col-md-4 p-t-10">
-                                        <span class="m-r-10 no-of-records"></span>
+                                <div class="row justify-content-md-center m-t-10 job-status" style="display:none;">
+                                    <div class="col-xs m-t-5">
+                                        <div class="circle"></div>
                                     </div>
-                                    <div class="col-md-8 d-flex justify-content-end cust-pager">
-
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-2">
-                                        <div class="form-group cust-filter-form-group">
-                                            <input type="date" id="fromDate" class="form-control" placeholder="" style="/* min-height: 38px; */display: block;">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group cust-filter-form-group">
-                                            <input type="date" id="toDate" class="form-control" placeholder="" style="/* min-height: 38px; */display: block;">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group cust-filter-form-group">
-                                            <select id="branchList" class="form-control custom-select">                                    
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group cust-filter-form-group">
-                                            <select id="empList" class="form-control custom-select">
-                                                <option>Filter By Employee</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group cust-filter-form-group">
-                                            <input type="text" id="phone" class="form-control" placeholder="Phone No">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                            <button type="button" class="btn waves-effect waves-light btn-primary offer-filter">GO</button>
-                                            <button type="button" class="btn waves-effect waves-light btn-danger offer-filter m-l-10 reset-filter">
-                                                <i class="fas fa-redo"></i>
-                                            </button>
+                                    <div class="col-xs m-t-5 m-l-10"><h4>API Call is Running for</h4></div>
+                                    <div class="col-xs m-t-5 m-l-10"><h4 class="current-job-type"></h4></div>
+                                    <div class="col-xs m-t-5 m-l-10"><h4 class="done-count">0</h4></div>
+                                    <div class="col-xs m-l-10 m-t-5"><h4>is done out of</h4></div>
+                                    <div class="col-xs m-l-10 m-t-5"><h4 class="total-count">0</h4></div>
+                                    <div class="col-xs m-l-10">
+                                        <button type="button" class="btn btn-danger stop-delayed-job"> Stop API Call</button>
                                     </div>
                                 </div>
+                                <!-- Nav tabs -->
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li class="nav-item"> <a class="nav-link active leadsIVR" data-toggle="tab" href="#leadsIVRPanel" role="tab"><span class="hidden-sm-up"><i class="icon-user-follow"></i></span> <span class="hidden-xs-down">Leads</span></a> </li>
+                                    <li class="nav-item"> <a class="nav-link dueIVR" data-toggle="tab" href="#dueIVRPanel" role="tab"><span class="hidden-sm-up"><i class="icon-people"></i></span> <span class="hidden-xs-down">Admission</span></a> </li>
+                                </ul>
+                                <!-- Tab panes -->
+                                <div class="tab-content tabcontent-border">
+                                    <div class="tab-pane active" id="leadsIVRPanel" role="tabpanel">
+                                        <!-- Filter Leads Start -->
+                                        <div class="card-body">
+                                            <div class="row justify-content-md-center">
+                                                <div class="col-xs m-r-5">
+                                                    <div class="form-group cust-filter-form-group">
+                                                        <input type="date" id="leads-fromDate" class="form-control fromDate custom-date ivr-call-filter-input" placeholder="">
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs m-r-5">
+                                                    <div class="form-group cust-filter-form-group">
+                                                        <input type="date" id="leads-toDate" class="form-control toDate custom-date ivr-call-filter-input" placeholder="">
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs m-r-5">
+                                                    <div class="form-group cust-filter-form-group">
+                                                        <select id="leads-branchList" class="form-control custom-select branchList ivr-call-filter-input">
+                                                            <option value="">Status</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs m-r-5">
+                                                    <div class="form-group cust-filter-form-group">
+                                                        <select id="leads-empList" class="form-control custom-select empList">
+                                                            <option>Filter By Employee</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs m-r-5">
+                                                    <div class="form-group cust-filter-form-group">
+                                                        <select id="leads-status" class="form-control custom-select status ivr-call-filter-input">
+                                                            <option value="">Status</option>
+                                                            <option value="Active">Active</option>
+                                                            <option value="Complete">Complete</option>
+                                                            <option value="Dead">Dead</option>
+                                                            <option value="Important">Important</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs m-r-5">
+                                                    <div class="form-group cust-filter-form-group">
+                                                        <input type="text" id="leads-phone" class="form-control phone ivr-call-filter-input" placeholder="Phone No">
+                                                    </div>
+                                                </div>
+                                               
+                                                <div class="col-xs">
+                                                    <button type="button" class="btn waves-effect waves-light btn-primary leads-offer-filter">GO</button>
+                                                    <button type="button" class="btn waves-effect waves-light btn-danger offer-filter leads-reset-filter">
+                                                        <i class="fas fa-redo"></i>
+                                                    </button> 
+                                                </div>
+                                            </div>
+                                            <hr/>
+                                            <div class="row m-t-5 justify-content-md-center leads-filter-result" style="display:none;">
+                                                <div class="col-xs p-t-10">
+                                                    <h4>Records Found : </h4>
+                                                </div>
+                                                <div class="col-md-1 p-t-10">
+                                                    <h4 class="leads-nofrecords">0</h4>
+                                                </div>
+                                                <div class="col-xs p-t-10">
+                                                    <h4>Please enter the delay time : </h4>
+                                                </div>
+                                                <div class="col-xs m-l-10">
+                                                    <input type="number" value="1" min="1" max="60" class="form-control leads-mins">
+                                                </div>
+                                                <div class="col-xs p-t-10 m-l-5">
+                                                    <h4>Minutes</h4>
+                                                </div>
+                                                <div class="col-xs m-l-10">
+                                                    <button type="button" class="btn btn-warning leads-set-call-timing">Set Call</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Filter Leads Ends -->
+                                    </div>
+                                    <div class="tab-pane" id="dueIVRPanel" role="tabpanel">
+                                        <!-- Filter Admission Ends -->
+                                        <div class="card-body">
+                                            <div class="row justify-content-md-center">
+                                                <div class="col-xs m-r-5">
+                                                    <div class="form-group cust-filter-form-group">
+                                                        <input type="date" id="adm-fromDate" class="form-control fromDate custom-date" placeholder="">
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs m-r-5">
+                                                    <div class="form-group cust-filter-form-group">
+                                                        <input type="date" id="adm-toDate" class="form-control toDate custom-date" placeholder="">
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs m-r-5">
+                                                    <div class="form-group cust-filter-form-group">
+                                                        <select id="adm-branchList" class="form-control custom-select branchList">                                    
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs m-r-5">
+                                                    <div class="form-group cust-filter-form-group">
+                                                        <select id="adm-empList" class="form-control custom-select empList">
+                                                            <option>Filter By Employee</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs m-r-5">
+                                                    <div class="form-group cust-filter-form-group">
+                                                        <select id="adm-branchList" class="form-control custom-select status ivr-call-filter-input">
+                                                            <option value="">Status</option>
+                                                            <option value="Active">Active</option>
+                                                            <option value="Complete">Complete</option>
+                                                            <option value="Dead">Dead</option>
+                                                            <option value="Important">Important</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs m-r-5">
+                                                    <div class="form-group cust-filter-form-group">
+                                                        <input type="text" id="adm-credit-amt" class="form-control credit-amt" placeholder="Credit Amt">
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs m-r-5">
+                                                    <div class="form-group cust-filter-form-group">
+                                                        <input type="text" id="adm-phone" class="form-control phone" placeholder="Phone No">
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs">
+                                                        <button type="button" class="btn waves-effect waves-light btn-primary adm-offer-filter">GO</button>
+                                                        <button type="button" class="btn waves-effect waves-light btn-danger offer-filter adm-reset-filter">
+                                                            <i class="fas fa-redo"></i>
+                                                        </button>
+                                                </div>
+                                            </div> 
+                                            <hr/>
+                                            <div class="row m-t-5 justify-content-md-center adm-filter-result" style="display:none;">
+                                                <div class="col-xs p-t-10">
+                                                    <h4>Records Found : </h4>
+                                                </div>
+                                                <div class="col-md-1 p-t-10">
+                                                    <h4 class="adm-nofrecords">0</h4>
+                                                </div>
+                                                <div class="col-xs p-t-10">
+                                                    <h4>Please enter the delay time : </h4>
+                                                </div>
+                                                <div class="col-xs m-l-10">
+                                                    <input type="number" value="1" min="1" max="60" class="form-control adm-mins">
+                                                </div>
+                                                <div class="col-xs p-t-10 m-l-5">
+                                                    <h4>Minutes</h4>
+                                                </div>
+                                                <div class="col-xs m-l-10">
+                                                    <button type="button" class="btn btn-warning adm-set-call-timing">Set Call</button>
+                                                </div>
+                                            </div> 
+                                        </div>
+                                        <!-- Filter Admission Ends --> 
+                                    </div>
+                                </div>
+                                <div class="apiList"> </div>               
                             </div>
-                            <!-- Filter End -->
-                            <div class="card-body p-b-0">
-                                <div class="apiList"></div>
+                             <!-- Start Add API Modal -->
+                            <div id="myModalAdd" class="modal bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="myModalLabelAdd">Add API</h4>
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form>
+                                                <div class="form-body">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group row">
+                                                                <label class="control-label text-right col-md-3">API URL</label>
+                                                                <div class="col-md-9">
+                                                                    <input type="text" class="add-api-url form-control" placeholder="">
+                                                                    <small class="form-control-feedback"> Use #phone# for Phone No and #text# for OTP</small>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label class="control-label text-right col-md-3">Class</label>
+                                                                <div class="col-md-9">
+                                                                    <select class="add-api-class form-control">
+                                                                        <option value="">-Class-</option>
+                                                                        <option value="CALL">CALL</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label class="control-label text-right col-md-3">Enable</label>
+                                                                <div class="col-md-9">
+                                                                    <input type="checkbox" class="add-api-status js-switch-add" data-size="small" data-color="#89e314" data-secondary-color="#f0f0f0" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <i style="display: none" class="fa fa-check"></i>
+                                            <button type="button" id="addAPI" class="btn btn-success waves-effect">Save</button>
+                                            <button type="button" id="addAPICancelBtn" class="btn btn-info waves-effect" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                    <!-- /.modal-content -->
+                                </div>
+                                <!-- /.modal-dialog -->
                             </div>
+                            <!-- End Add API Modal -->
+                            <!-- Start Edit API Modal -->
+                            <div id="myModal" class="modal bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="myModalLabel">Edit API</h4>
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form>
+                                                <div class="form-body">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group row">
+                                                                <label class="control-label text-right col-md-3">API URL</label>
+                                                                <div class="col-md-9">
+                                                                    <input type="text" class="api-url form-control" placeholder="">
+                                                                    <small class="form-control-feedback"> Use #phone# for Phone No and #text# for OTP</small>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label class="control-label text-right col-md-3">Class</label>
+                                                                <div class="col-md-9">
+                                                                    <select class="api-class form-control">
+                                                                        <option value="">-Class-</option>
+                                                                        <option value="CALL">CALL</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label class="control-label text-right col-md-3">Enable</label>
+                                                                <div class="col-md-9">
+                                                                    <input type="checkbox" class="api-status js-switch-edit" data-size="small" data-color="#89e314" data-secondary-color="#f0f0f0" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <i style="display: none" class="fa fa-check"></i>
+                                            <button type="button" id="updateAPI" class="btn btn-success waves-effect">Save</button>
+                                            <button type="button" id="updateAPICancelBtn" class="btn btn-info waves-effect" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                    <!-- /.modal-content -->
+                                </div>
+                                <!-- /.modal-dialog -->
+                            </div>
+                            <!-- End Edit API Modal -->
                         </div>
                     </div>
                 </div>
@@ -376,6 +636,7 @@ if (!isset($_SESSION['OTP_C']) && empty($_SESSION['OTP_C'])) {
     <!-- Sweet-Alert  -->
     <script src="../assets/node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
     <!--Custom JavaScript -->
+    <script src="../assets/node_modules/switchery/dist/switchery.min.js"></script>
     <script src="../assets/node_modules/jsgrid/db.js"></script>
     <script type="text/javascript" src="../assets/node_modules/jsgrid/jsgrid.min.js"></script>
     <script src="../dist/js/custom.min.js"></script>
@@ -385,8 +646,6 @@ if (!isset($_SESSION['OTP_C']) && empty($_SESSION['OTP_C'])) {
     <script src="../assets/node_modules/toast-master/js/jquery.toast.js"></script>
     <script src="../dist/js/accNavDetails.js?_=<?php echo time();?>"></script>
     <script src="../dist/js/common.js?_=<?php echo time();?>"></script>
-    <script type="module" src="../dist/js/common/index.js?_=<?php echo time();?>"></script>
-    <script type="module" src="../dist/js/communicationApi/index.js?_=<?php echo time();?>"></script>
     <script type="module" src="../dist/js/ivrCallSchedule.js?_=<?php echo time();?>"></script>
 </body>
 </html>

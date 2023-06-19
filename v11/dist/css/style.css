@@ -22197,3 +22197,7 @@ File: scss
 .no-of-records{
   font-size: 16px;
 }
+
+.ivr-call-filter-input{
+  width: 150px !important;
+}

@@ -5,6 +5,7 @@ require_once '../includes/categoryDatabase.php';
 require_once '../includes/managebranchDatabase.php';
 require_once '../includes/db.php';
 require_once '../includes/student.php';
+require_once '../includes/communication.php';
  session_start();
 if(empty($_SESSION['id'])){
    header('Location: ' . constant('BASE_URL'));
@@ -16,6 +17,7 @@ $category = new categoryDatabase();
 $branchData = new managebranchDatabase();
 $dbObj=new db();
 $studentObj = new student();
+$commObj = new communication();
 $today=date('ymd');
 
 $errors = array();
@@ -27,7 +29,8 @@ $apiClass = array('WHATSUP','CALL','SMS');
 //$type = 'LOGIN_OTP';
 $api_type = array(
     'login' => 'LOGIN_OTP',
-    'due' => 'DUE_FEES'
+    'due' => 'DUE_FEES',
+    'ivr' => 'IVR_CALL'
  );
 $current_api_type = $api_type['login'];
 if (isset($postedData['type'])) {
@@ -40,6 +43,9 @@ if (!in_array($postedData['className'],$apiClass)) {
 if (!count($errors)) {
     $insertData = array('api'=>$postedData['api'],'type'=>$current_api_type, 'class' => $postedData['className'], 'status' => $postedData['status']);
     $resultInsert = $dbObj->dataInsert($insertData, 'sms_api');
+    if ($postedData['status'] && ($current_api_type == $api_type['ivr'])) {
+        $resultInsert = $commObj->markDefaultPerType($resultInsert, $current_api_type);
+    }
     if ($resultInsert) {
         $result['success'] = true;
         $result['id'] = $resultInsert;

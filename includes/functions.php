@@ -107,4 +107,99 @@ function getIpLoc( $ip ){
 	curl_close($ch);
 	return $address;
 }
+
+/**
+ *  Get Filter SQL for Leads 
+ * 
+*/
+function getLeadsFilterSQl($flterInput) 
+{
+	$filterSql = '';
+	 // Date Filter
+	 if ((isset($flterInput['from_date']) && !empty($flterInput['from_date'])) && (isset($flterInput['to_date']) && !empty($flterInput['to_date']))) {
+		$filterSql .= "(create_date  >= '".$flterInput['from_date']." 00:00:00' AND create_date <= '" . $flterInput['to_date'] ."  23:59:59') AND";   
+	 }
+	 $isOnlyBranch = true;
+	 if ((isset($flterInput['emp']) && !empty($flterInput['emp'])) && (isset($flterInput['branch']) && !empty($flterInput['branch']))) {
+		$isOnlyBranch = false;
+	 }
+	 //Branch Filter
+	 if ((isset($flterInput['branch']) && !empty($flterInput['branch'])) && $isOnlyBranch) {
+		$filterSql .= " (branch_id  = '".$flterInput['branch']."') AND";   
+	 }
+	 //Employee Filter
+	 if ((isset($flterInput['emp']) && !empty($flterInput['emp'])) && !$isOnlyBranch) {
+		$filterSql .= " (branch_id  = '".$flterInput['branch']."' AND emp_id  = '".$flterInput['emp']."') AND";   
+	 }
+	 //Phone Filter
+	 if (isset($flterInput['phone']) && !empty($flterInput['phone'])) {
+		$filterSql .= " (phone  = '".$flterInput['phone']."') AND";   
+	 }
+	 
+	 //Status Filter
+	 if (isset($flterInput['status']) && !empty($flterInput['status'])) {
+		$filterSql .= " (status  = '".$flterInput['status']."') AND";   
+	 }
+
+	 if (strlen($filterSql)>0) {
+		$filterSql = rtrim($filterSql, "AND");
+	 }
+
+	 return $filterSql;
+}
+
+/**
+ *  Get Filter SQL for Leads 
+ * 
+*/
+function getAdmissionFilterSQl($flterInput) 
+{
+	$filterSql = '';
+
+	if ((isset($flterInput['from_date']) && !empty($flterInput['from_date'])) && (isset($flterInput['to_date']) && !empty($flterInput['to_date']))) {
+		$filterSql .= "(doj  >= '".$flterInput['from_date']." 00:00:00' AND doj <= '" . $flterInput['to_date'] ."  23:59:59') AND";   
+	 }
+
+	 $isOnlyBranch = true;
+	 if ((isset($flterInput['emp']) && !empty($flterInput['emp'])) && (isset($flterInput['branch']) && !empty($flterInput['branch']))) {
+		$isOnlyBranch = false;
+	 }
+	 //Branch Filter
+	 if ((isset($flterInput['branch']) && !empty($flterInput['branch']))  && $isOnlyBranch) {
+		$filterSql .= " (branch_name  = '".$flterInput['branch']."') AND";   
+	 }
+	 //Employee Filter
+	 if ((isset($flterInput['emp']) && !empty($flterInput['emp'])) && !$isOnlyBranch) {
+		$filterSql .= " (branch_name  = '".$flterInput['branch']."' AND emp_id  = '".$flterInput['emp']."') AND";   
+	 }
+	 //Phone Filter
+	 if (isset($flterInput['phone']) && !empty($flterInput['phone'])) {
+		$filterSql .= " (phone  = '".$flterInput['phone']."') AND";   
+	 }
+	 
+	 //Status Filter
+	 if (isset($flterInput['status']) && !empty($flterInput['status'])) {
+		$filterSql .= " (status  = '".$flterInput['status']."') AND";   
+	 }
+
+	 //Credit Amount Filter
+	 if (isset($flterInput['credit_amt']) && !empty($flterInput['credit_amt'])) {
+		$filterSql .= " (credit_amt  = '".$flterInput['credit_amt']."') AND";   
+	 }
+
+	 if (strlen($filterSql)>0) {
+		$filterSql = rtrim($filterSql, "AND");
+	 }
+
+	 return $filterSql;
+}
+
+function getCountFromObject($objectName) {
+	if ($objectName == '') {
+		return false;
+	}
+	$sql = 'SELECT count(*) FROM ' . $objectName;
+	$row =  mysql_fetch_row(mysql_query($sql));
+	return $row[0];
+}
 ?>

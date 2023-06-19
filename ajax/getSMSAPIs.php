@@ -19,7 +19,8 @@ $studentObj = new student();
 $today=date('ymd');
 $api_type = array(
    'login' => 'LOGIN_OTP',
-   'due' => 'DUE_FEES'
+   'due' => 'DUE_FEES',
+   'ivr' => 'IVR_CALL'
 );
 $current_api_type = $api_type['login'];
 if (isset($_GET['type'])) {
