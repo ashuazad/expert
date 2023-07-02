@@ -695,26 +695,29 @@ function renderDueFeeGrid(elementSel, gridInfo){
             }
         },
         fields: [
-            { name: "roll_no", title: "Roll No", type: "text", width: 50},
-            { name: "name", title: "Name", type: "text", width: 100, cellRenderer : function (value, item) {
+            { name: "roll_no", title: "Roll No", type: "text", width: '4%', css :"gird-cell-text-alignment" },
+            { name: "name", title: "Name", type: "text", width: '10%', cellRenderer : function (value, item) {
                     admRecords[item.a_id] =item;
                     var tdInner = '';
                     tdInner = '<td><span class="followupAdmDueFee" data-regno="'+item.regno+'" data-row="'+item.a_id+'" style="cursor:pointer;" data-toggle="modal" data-target="#grid-modal-due-fee">'+item.name+'</span></td>';
                     return tdInner;
-                } },
-            { name: "phone", title: "Phone", type: "text", width: 100 },
-            { name: "courses", title: "Courses", type: "text", width: 180},
-            { name: "total_fee", title: "Total Fee", type: "text", width: 100 },
-            { name: "credit_amt", title: "Credit Fee", type: "text", width: 100 },
-            { name: "due_fee", title: "Due Fee", type: "text", width: 100 },
-            { name: "message", title: "Remark", type: "text", width: 100, cellRenderer:function (value, item) {
+                }, css :"gird-cell-text-alignment"  },
+            { name: "phone", title: "Phone", type: "text", width: '10%',cellRenderer:function (value, item) {
+                var phoneText = value[0]+value[1]+'*****'+value[value.length-3]+value[value.length-2]+value[value.length-1];
+                return '<td>' + phoneText + '</td>';
+            }, css :"gird-cell-text-alignment" },
+            { name: "courses", title: "Courses", type: "text", width: '14%', css :"gird-cell-text-alignment" },
+            { name: "total_fee", title: "Total Fee", type: "text", width: '9%', css :"gird-cell-text-alignment"  },
+            { name: "credit_amt", title: "Credit Fee", type: "text", width: '9%', css :"gird-cell-text-alignment"  },
+            { name: "due_fee", title: "Due Fee", type: "text", width: '9%', css :"gird-cell-text-alignment"  },
+            { name: "message", title: "Remark", type: "text", width: '10%', cellRenderer:function (value, item) {
                     var moretxtRemark = (item.message.length>22)?'...':'';
                     var toltipAttr = 'data-toggle="tooltip" data-placement="top" title="'+item.message+'"';
                     return  '<td><a class="dueFeeFollowupHistory" data-regno="'+item.regno+'" data-row="'+item.regno+'" href="javascript:void(0)" data-toggle="modal" data-target="#grid-modal-due-fee-followups"'+toltipAttr+'>'+item.message.substring(0,22)+moretxtRemark+'</a></td>';
-                }
+                }, css :"gird-cell-text-alignment" 
             },
-            { name: "last_followup_date", title: "Followup Date", type: "text", width: 120 },
-            { name: "dueDate", title: "Due Date", type: "text", width: 100 },
+            { name: "last_followup_date", title: "Followup Date", type: "text", width: 120, css :"gird-cell-text-alignment"  },
+            { name: "dueDate", title: "Due Date", type: "text", width: '9%' , css :"gird-cell-text-alignment" },
             {
                 type: "control",cellRenderer : function (value, item) {
                     var tdInner = '';

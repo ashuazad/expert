@@ -22201,3 +22201,12 @@ File: scss
 .ivr-call-filter-input{
   width: 150px !important;
 }
+
+.custom-jsgrid-cell {
+  height: 60px;
+}
+
+.followupAdmDueFee{
+  text-decoration: underline;
+  cursor: pointer;
+}

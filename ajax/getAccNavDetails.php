@@ -4,6 +4,7 @@ require_once '../includes/categoryDatabase.php';
 require_once '../includes/userqueryDatabase.php';
 require_once '../includes/managebranchDatabase.php';
 require_once '../includes/db.php';
+require_once '../includes/userPermissions.php';
 session_start();
 if (!$_SESSION['id']) {
     header('Location: ' . constant('BASE_URL'));
@@ -13,6 +14,7 @@ $id = $_SESSION['id'];
 $categoryObj = new categoryDatabase();
 $user_query = new userqueryDatabase();
 $manage_branchObj = new managebranchDatabase();
+$empPermission = new userPermissions($id);
 $dbObj = new db();
 if ($id == '1') {
     $arr_nav = array(
@@ -45,6 +47,11 @@ if ($id == '1') {
             "link" => "/v11/superadmin/userPermission.php",
             "icon" => "icon-user",
             "name" => "User Permission"
+        ),
+        array(
+            "link" => "/v11/searchLeadsAdmissions.php",
+            "icon" => "ti-clipboard",
+            "name" => "Search"
         )
     );
     $login_user = 'Super Admin';
@@ -73,6 +80,15 @@ $arr_nav = array(
         "name" => "Incentive"
     )
 );
+if ($empPermission->userPermission['search_leads_admissions']) {
+    $isPermissionEnable = true;
+    $where = " 1=1 ";
+    $arr_nav[] = array(
+        "link" => "/v11/searchLeadsAdmissions.php",
+        "icon" => "ti-clipboard",
+        "name" => "Search"
+    );
+}
 }
 $data = array(
             "login_user" => $login_user,

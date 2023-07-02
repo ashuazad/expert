@@ -203,6 +203,7 @@ if ($_POST['type'] == 'add_branch') {
     $all_due_fee_pem = mysql_real_escape_string($_POST['all_due_fee_pem']);
     $all_admission_perm = mysql_real_escape_string($_POST['all_admission_perm']);
     $all_fee_pay_pem = mysql_real_escape_string($_POST['all_fee_pay_pem']);
+    $serach_leads_adm_pem = mysql_real_escape_string($_POST['serach_leads_adm']);
     $date = date('Y-m-d');
     $role = $_POST['role'];
     $id = $_POST['id'];
@@ -287,7 +288,8 @@ if ($_POST['type'] == 'add_branch') {
 	                    'emp_set_discount'=> $_POST['emp_set_discount'],
 	                    'all_due_fee_pem' => $_POST['all_due_fee_pem'],
 	                    'all_admission_perm' => $all_admission_perm,
-	                    'all_fee_pay_pem' => $all_fee_pay_pem);	
+	                    'all_fee_pay_pem' => $all_fee_pay_pem,
+                        'search_leads_admissions' => $serach_leads_adm_pem);	
 
  		$userPermissions->setPermission($prmArray,$id);  
            

@@ -10,12 +10,14 @@ require_once '../includes/managebranchDatabase.php';
 require_once '../includes/useraccountDatabase.php';
 require_once '../includes/db.php';
 require_once '../v11/lib/utilities.php';
+require_once '../includes/userPermissions.php';
  session_start();
 if(!$_SESSION['id']){
    header('Location: ' . constant('BASE_URL'));
    exit;
 }
 $id = $_SESSION['id'];
+//print_r($_SESSION);
 //$id = 34;
 $userquery = new userqueryDatabase();
 $category = new categoryDatabase();
@@ -27,8 +29,6 @@ $posted = json_decode(file_get_contents('php://input'),1);
 $today = date('Y-m-d');
 $column = array(
     "id", " CONVERT(name USING utf8) as name", " CONVERT(email USING utf8) as email",
-    //"CONCAT( LEFT(TRIM(phone),3),'*****',SUBSTR(TRIM(phone),LENGTH(TRIM(phone))-1,2)) AS phone",
-    "phone",
     "REPLACE(REPLACE(category,'-',' '),'+',', ') AS category",
     "IF(last_follow_up='0000-00-00 00:00:00' OR last_follow_up IS NULL, 'NONE', DATE_FORMAT(last_follow_up , ".DATE_TIME_FORMAT.")) last_follow_up",
     "IF(next_followup_date='0000-00-00 00:00:00' OR next_followup_date IS NULL, 'NONE', DATE_FORMAT(next_followup_date , ".DATE_FORMAT.")) next_followup_date",
@@ -39,10 +39,28 @@ $column = array(
 /*$column = array(
     "name","email","CONVERT(CONCAT( LEFT(TRIM(phone),3),'*****',SUBSTR(TRIM(phone),LENGTH(TRIM(phone))-1,2)) USING utf8) AS phone"
 );*/
-$where = " emp_id = ".$id;
+$isPermissionEnable = false;
 #### Search ###
+$where = " emp_id = ".$id;
 $search = '';
 if (isset($_GET['param']) && !empty($_GET['param'])) {
+    // Incase of param all checking user type and permission.
+    if ($_GET['param'] == 'all') {
+        switch ($_SESSION['USER_TYPE']) {
+            case 'SUPERADMIN' :
+                    $where = ""; 
+                    $isPermissionEnable = true;
+                break;
+            case 'EMPLOYEE':
+                    $empPermission = new userPermissions($id);
+                    if ($empPermission->userPermission['search_leads_admissions']) {
+                        $where = "";
+                        $isPermissionEnable = true;
+                    }
+                break;
+        }
+    }
+
     foreach ($_GET as $searchKey => $searchValue) {
         if (strlen($searchValue)>0) {
             switch ($searchKey) {
@@ -68,7 +86,7 @@ if (isset($_GET['param']) && !empty($_GET['param'])) {
 }
 if (strlen($search)>0) {
     $search = rtrim($search, 'AND ');
-    $where .= ' AND ( '.$search.' ) ';
+    $where .= (strlen($where)) ? ' AND ( '.$search.' ) ' : ' ( '.$search.' ) ';
 }
 
 #### Search ###
@@ -96,9 +114,16 @@ if(isset($_GET['param']) && !empty($_GET['param'])){
         case 'allStatus':
             $searchWhere = $where." AND (status != 'Start') order by last_follow_up desc";
             break;
+        case 'all':
+            $searchWhere = $where." order by last_follow_up desc";
+            break;    
         default:
             break;
     }
+    if ($isPermissionEnable) {
+        $column[] = '(SELECT CONCAT(first_name,last_name) FROM login_accounts WHERE id = emp_id) AS lead_emp_name';    
+    }
+    $column[] = ($param == 'all')?' INSERT(phone, 4, 4, "****") AS phone':'phone';
     //echo $searchWhere;
     if($searchWhere){
         $admsAry=$dbObj->getData($column,"leads l", $searchWhere);

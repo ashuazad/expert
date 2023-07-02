@@ -24,22 +24,26 @@ $loadDeadAdmissions = false;
 $where = '1=1 ';
 $userType = null;
 $isPermissionEnable = false;
+$isAddMask = false;
 $posted = json_decode(file_get_contents('php://input'),1);
 //echo json_encode($data);
 $column = array(
-            "a_id", "regno", "roll_no", "name", "phone", "REPLACE(REPLACE(course,'-',' '),'+',', ') AS courses", "total_fee", "due_fee", 
+            "a_id", "regno", "roll_no", "name", "REPLACE(REPLACE(course,'-',' '),'+',', ') AS courses", "total_fee", "due_fee", 
             "DATE_FORMAT( doj , ".DATE_FORMAT.") admDate",
             "DATE_FORMAT( next_due_date , ".DATE_FORMAT.") dueDate",
             "(total_fee-due_fee) AS credit_amt",
             "IF(message='',followup_remark,message) AS message",
+            "emp_id", "lead_userId","fee_status as status",
             "DATE_FORMAT((SELECT followup FROM admission_followups WHERE regno = adm.regno ORDER BY followup DESC limit 0,1),".DATE_TIME_FORMAT.") AS last_followup_date"
             );
 
 $userType = (isset($_SESSION['USER_TYPE']) && !empty($_SESSION['USER_TYPE']))?$_SESSION['USER_TYPE']:null;
+//print_r($userType);
 //Check user type and according to that applying the restrictions
 switch ($userType){
     case 'SUPERADMIN':
             $loadDeadAdmissions = true;
+            $isPermissionEnable = true;
         break;
     case 'EMPLOYEE':
             $strPermissionCondition = ''; 
@@ -50,11 +54,17 @@ switch ($userType){
             }
             if (strlen($empPermission->userPermission['view_branch_admissions'])>0) {
                 $isPermissionEnable = true;
-                $strPermissionCondition .= " (branch_name IN ('".str_replace("','",',',$empPermission->userPermission['view_branch_admissions'])."'))";
+                $strPermissionCondition .= " (branch_name IN ('".str_replace(',', "', '" , $empPermission->userPermission['view_branch_admissions'])."'))";
             }
             $where = " emp_id = ".$id;
             if (strlen($strPermissionCondition) > 0) {
                 $where = '('.$where.' OR (' . $strPermissionCondition . '))';        
+            }
+
+            if ($empPermission->userPermission['search_leads_admissions']) {
+                $isAddMask = true;
+                $isPermissionEnable = true;
+                $where = " 1=1 ";
             }
         break;
     default:
@@ -62,8 +72,9 @@ switch ($userType){
 }
 
 if ($isPermissionEnable) {
-    $column[] = '(SELECT branch_name FROM login_accounts WHERE id = (SELECT branch_id FROM login_accounts WHERE id = emp_id)) AS branch_name';
-    $column[] = '(SELECT CONCAT(first_name,last_name) FROM login_accounts WHERE id = emp_id) AS emp_name';
+    $column[] = '(SELECT branch_name FROM login_accounts WHERE id = (SELECT branch_id FROM login_accounts WHERE id = lead_userId)) AS branch_name';
+    $column[] = '(SELECT CONCAT(first_name,last_name) FROM login_accounts WHERE id = lead_userId) AS emp_name';
+    $column[] = '(SELECT CONCAT(first_name,last_name) FROM login_accounts WHERE id = emp_id) AS billing_emp_name';
 }
 
 if (!$loadDeadAdmissions) {
@@ -77,6 +88,9 @@ if (isset($_GET['param']) && !empty($_GET['param'])) {
             switch ($searchKey) {
                 case 'roll_no':
                     $search .= "(roll_no = '" . $searchValue . "') AND ";
+                    break;
+                case 'reg_no':
+                    $search .= "(regno = '" . $searchValue . "') AND ";
                     break;
                 case 'name':
                     $search .= "(name LIKE '%" . $searchValue . "%') AND ";
@@ -107,6 +121,7 @@ if (isset($_GET['param']) && !empty($_GET['param'])) {
                     break;
             }
         }
+        $column[] = ($_GET['param'] == 'alladm')?' INSERT(phone, 4, 4, "****") AS phone':'phone';
     }
 
 }
@@ -121,7 +136,7 @@ if(isset($_GET['param']) && !empty($_GET['param'])){
     $searchWhere = false;
     switch ($param){
         case 'todaypending':
-            $searchWhere = $where." AND (next_due_date = '".date('Y-m-d')."' AND due_fee > 0 AND status) order by a_id desc";
+            $searchWhere = $where." AND (next_due_date = '".date('Y-m-d')."' AND due_fee > 0) order by a_id desc";
             break;
         case 'allpending':
             $searchWhere = $where." AND (next_due_date <= '".date('Y-m-d')."' AND due_fee > 0) order by a_id desc";
@@ -134,6 +149,9 @@ if(isset($_GET['param']) && !empty($_GET['param'])){
         case 'allbooking':
             $searchWhere = $where." AND ((total_fee-due_fee) < 2000) order by a_id desc";
             break;
+        case 'alladm':
+            $searchWhere = $where."  order by a_id desc";
+            break;
         default:
             break;
     }
@@ -142,10 +160,9 @@ if(isset($_GET['param']) && !empty($_GET['param'])){
     }
     //echo $searchWhere;
     if($searchWhere){
-        $admsAry=$dbObj->getData($column,"admission adm", $searchWhere,1);
-        print_r($admsAry);
+        $admsAry=$dbObj->getData($column,"admission adm", $searchWhere);
     }
 }
 array_shift($admsAry);
-echo json_encode(mb_convert_encoding($admsAry, "UTF-8", "UTF-8"));
 echo json_encode($admsAry);
+//echo json_encode(mb_convert_encoding($admsAry, "UTF-8", "UTF-8"));
