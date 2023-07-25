@@ -481,6 +481,17 @@ if($fetchrecord != 'admin'){
                                    </select>
                             </div>
                             <div class="clear"></div>
+                        </div>
+                        <div class="row-form">
+                            <div class="span2">Send Leads & Admissions:</div>
+                            <div class="span3">                                        
+                                <select name="send_leads_adm" id="send_leads_adm">
+                                          <option value="">-Select-</option>
+ <option <?php if($permissions->userPermission['send_leads_admissions']==="1")echo 'selected="selected"';?> value="1">Yes</option>
+ <option <?php if($permissions->userPermission['send_leads_admissions']==="0")echo 'selected="selected"';?> value="0">No</option>
+                                   </select>
+                            </div>
+                            <div class="clear"></div>
                         </div> 
                         <?php if($fetchid['category'] != ''){    ?>
                         <div class="row-form">

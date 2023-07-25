@@ -81,12 +81,17 @@ $arr_nav = array(
     )
 );
 if ($empPermission->userPermission['search_leads_admissions']) {
-    $isPermissionEnable = true;
-    $where = " 1=1 ";
     $arr_nav[] = array(
         "link" => "/v11/searchLeadsAdmissions.php",
         "icon" => "ti-clipboard",
         "name" => "Search"
+    );
+}
+if ($empPermission->userPermission['send_leads_admissions']) {
+    $arr_nav[] = array(
+        "link" => "/v11/sendLeadsAdmissions.php",
+        "icon" => "ti-clipboard",
+        "name" => "Send"
     );
 }
 }

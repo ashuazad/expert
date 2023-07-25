@@ -34,7 +34,8 @@ $column = array(
             "(total_fee-due_fee) AS credit_amt",
             "IF(message='',followup_remark,message) AS message",
             "emp_id", "lead_userId","fee_status as status",
-            "DATE_FORMAT((SELECT followup FROM admission_followups WHERE regno = adm.regno ORDER BY followup DESC limit 0,1),".DATE_TIME_FORMAT.") AS last_followup_date"
+            "DATE_FORMAT((SELECT followup FROM admission_followups WHERE regno = adm.regno ORDER BY followup DESC limit 0,1),".DATE_TIME_FORMAT.") AS last_followup_date",
+            "phone AS phone_full"
             );
 
 $userType = (isset($_SESSION['USER_TYPE']) && !empty($_SESSION['USER_TYPE']))?$_SESSION['USER_TYPE']:null;
@@ -62,6 +63,12 @@ switch ($userType){
             }
 
             if ($empPermission->userPermission['search_leads_admissions']) {
+                $isAddMask = true;
+                $isPermissionEnable = true;
+                $where = " 1=1 ";
+            }
+
+            if ($empPermission->userPermission['send_leads_admissions']) {
                 $isAddMask = true;
                 $isPermissionEnable = true;
                 $where = " 1=1 ";
@@ -119,11 +126,21 @@ if (isset($_GET['param']) && !empty($_GET['param'])) {
                 case 'message':
                     $search .= "(message LIKE '%" . $searchValue . "%') AND ";
                     break;
+                case 'branch':
+                    $search .= "(branch_name = '" . $searchValue . "') AND ";
+                    break;
+                case 'emp':
+                    $search .= "(branch_name = '" . $_GET['branch'] . "' AND emp_id = '" . $searchValue . "') AND ";
+                    break;
+                case 'status':
+                    $search .= "(fee_status = '" . $searchValue . "') AND ";
+                    break;
             }
         }
-        $column[] = ($_GET['param'] == 'alladm')?' INSERT(phone, 4, 4, "****") AS phone':'phone';
     }
-
+    if (isset($_GET['from_date']) && !empty($_GET['from_date']) && isset($_GET['to_date']) && !empty($_GET['to_date'])) {
+        $search.=" (doj  >= '".$_GET['from_date']."' AND doj <= '".$_GET['to_date']."') AND";    
+    } 
 }
 if (strlen($search)>0) {
     $search = rtrim($search, 'AND ');
@@ -137,20 +154,26 @@ if(isset($_GET['param']) && !empty($_GET['param'])){
     switch ($param){
         case 'todaypending':
             $searchWhere = $where." AND (next_due_date = '".date('Y-m-d')."' AND due_fee > 0) order by a_id desc";
+            $column[] = ' INSERT(phone, 4, 4, "****") AS phone';
             break;
         case 'allpending':
             $searchWhere = $where." AND (next_due_date <= '".date('Y-m-d')."' AND due_fee > 0) order by a_id desc";
+            $column[] = ' INSERT(phone, 4, 4, "****") AS phone';
             break;
         case 'todaydone':
            // $column[] = "DATE_FORMAT((SELECT followup FROM admission_followups WHERE regno = adm.regno ORDER BY followup DESC limit 0,1),".DATE_TIME_FORMAT.") AS last_followup_date";
             $todaydoneWhere = "(SELECT regno FROM admission_followups WHERE user_id = ".$id." AND date(followup) = '".date('Y-m-d')."')";
             $searchWhere = "regno IN(".$todaydoneWhere.") order by a_id desc";
+            $column[] = ' INSERT(phone, 4, 4, "****") AS phone';
             break;
         case 'allbooking':
             $searchWhere = $where." AND ((total_fee-due_fee) < 2000) order by a_id desc";
+            $column[] = ' INSERT(phone, 4, 4, "****") AS phone';
             break;
         case 'alladm':
             $searchWhere = $where."  order by a_id desc";
+            $actionList_Phone_Mask = array('SEARCH');
+            $column[] = (in_array($_GET['act'],$actionList_Phone_Mask)) ?' INSERT(phone, 4, 4, "****") AS phone':'phone';
             break;
         default:
             break;

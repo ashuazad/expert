@@ -39,7 +39,8 @@ $column = array(
             "IF(message='',followup_remark,message) AS message",
             "IF(last_followup_date='0000-00-00 00:00:00' OR last_followup_date IS NULL, 'NONE', DATE_FORMAT(last_followup_date , ".DATE_TIME_FORMAT.")) AS last_followup_date",
              "CONCAT(la.first_name,' ',la.last_name) AS user_name",
-            $followUpUserSQL
+            $followUpUserSQL,
+            "adm.phone AS phone_full"
             );
 
 $userType = (isset($_SESSION['USER_TYPE']) && !empty($_SESSION['USER_TYPE']))?$_SESSION['USER_TYPE']:null;

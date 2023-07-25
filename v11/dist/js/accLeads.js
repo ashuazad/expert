@@ -15,7 +15,6 @@ var leadsRecords={};
 var closeButtonHtml = '<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">×</span> </button>';
 var isRemark = true;
 var api_Allpending = baseUrl + '/ajax/getAccDueFees.php?_=' + currentTime;
-var lastFollowUpId = null;
 //Due Fees
 var admRecords={};
 
@@ -45,19 +44,6 @@ function getColumnDefinition(gridInfo)
         definition = { name: "last_fees_date", title: "Last Receipt", type: "text", width: 120 }
     }
     return definition;
-}
-
-function setLeadFollowupsHeading(data)
-{
-    $('.lead-name').html(data.name);
-    $('.lead-phone').html(data.phone);
-    $('.lead-emailId').html(data.email);
-    $('.lead-Ip').html(data.ip);
-    $('.lead-course').html(data.category);
-    $('.lead-address').html(data.address);
-    $('#quotation_lead_id').val(data.id);
-    $('#quotation_lead_name').val(data.name);
-    $('#quotation_lead_phone').val(data.phone);
 }
 
 function setIpLocation(data)
@@ -179,18 +165,6 @@ function getLeadStatus()
     });
 }
 
-function getLeadFollowupStatus(renderElement){
-    $.ajax({
-        url: baseUrl + '/ajax/getLeadStatus.php?_=' + currentTime,
-        type : 'POST',
-        contentType : 'application/json',
-        dataType:'json',
-        success : function( data ){
-            renderStatus(data,renderElement);
-        }
-    });
-}
-
 function items(item)
 {
     var itemsList = Array();
@@ -251,37 +225,6 @@ function getGridColumns(tabName){
     return objColumns;
 }
 
-function getLeadFollowupHistory(leadId, saveFlag = 0, elementId){
-    var norows = '';
-    norows = (saveFlag > 0)? '&r=3' : '';
-    $.ajax({
-        url: baseUrl + '/ajax/getLeadFollowups.php?_=' + currentTime + norows,
-        type : 'POST',
-        contentType : 'application/json',
-        dataType:'json',
-        data : JSON.stringify({"leadId":leadId}),
-        success : function( data ){
-            if (data.length) {
-                lastFollowUpId = data[0].id;
-            }
-            renderFollowups(data, elementId);
-        }
-    });
-}
-
-function getLeadRemarkMsg()
-{
-    $.ajax({
-        url: baseUrl + '/ajax/getLeadRemark.php?_=' + currentTime,
-        type : 'POST',
-        contentType : 'application/json',
-        dataType:'json',
-        success : function( data ){
-            renderRemark(data);
-        }
-    });
-}
-
 //Lead Edit
 function enableEditField()
 {
@@ -289,14 +232,6 @@ function enableEditField()
     $('.lead-edit-row').hide('fast');
     $('.lead-save-button').show('fast');
     $('.lead-edit-button').hide('fast');
-}
-
-function disableEditField()
-{
-    $('.lead-edit .controls').hide('fast');
-    $('.lead-edit-row').show('fast');
-    $('.lead-save-button').hide('fast');
-    $('.lead-edit-button').show('fast');
 }
 
 function setEditFields()

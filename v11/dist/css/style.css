@@ -22210,3 +22210,29 @@ File: scss
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* Search Leads and Admission */
+
+.search-row{
+  font-weight: 600;
+}
+
+.search-lead-assigned {
+  background:#F8F8F8 !important;
+}
+
+.search-lead-once-dead {
+  background:#ffb612 !important;
+}
+
+.search-lead-multi-dead {
+  background:#ff1c37 !important;
+}
+
+.search-lead-exists {
+  background:#a2d246 !important;
+}
+
+.search-lead-assigned, .search-lead-once-dead, .search-lead-multi-dead, .search-lead-exists > td {
+  font-weight:normal !important;
+}

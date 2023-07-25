@@ -253,6 +253,7 @@ var all_fee_pay_pem = $('#all_fee_pay_pem').val();
 var insentive = $('#insentive').val();
 var username = $('#username').val();
 var serach_leads_adm = $('#serach_leads_adm').val();
+var send_leads_adm = $('#send_leads_adm').val();
 if(username == ''){
     alert('Please enter Username.');
     $('#username').focus();
@@ -293,7 +294,7 @@ if(action == 'update'){
 'type':'add_branch','password':password,'email':email,'phone':phone,'username':username,
 'city':city,'address':address,'first_name':first_name,'last_name':last_name,
 'branch_name':branch_name,'action':action,'role':role,'admission_frm_perm':admission_frm_perm, 'admission_dashboard_perm':admission_dashboard_perm,'id':id,'branch_id':branch_id,'category':category,'fees_view_roll':fees_view_roll,'adm_from_details_phone': adm_from_details_phone,'emp_set_discount':emp_set_discount,'all_due_fee_pem':all_due_fee_pem,'all_admission_perm':all_admission_perm,'all_fee_pay_pem':all_fee_pay_pem,'insentive':insentive,
-'status':$('#status').val(),'salary':$('#salary').val(),'office_address':office_address,'serach_leads_adm':serach_leads_adm
+'status':$('#status').val(),'salary':$('#salary').val(),'office_address':office_address,'serach_leads_adm':serach_leads_adm,'send_leads_adm':send_leads_adm
 },
 function(data)
 { 

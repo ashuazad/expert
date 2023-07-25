@@ -48,7 +48,7 @@ $(".branchList").change(function(){
 });
 
 // Filter
-const getFilterData = (objType) => {
+const getSearchFilterData = (objType) => {
     let strType = objType;
     objType = '#' + objType + '-';
     let filter = new Object();
@@ -56,12 +56,14 @@ const getFilterData = (objType) => {
         case 'leads':
             filter['phone'] = $(objType+'phone').val();     
             filter['param'] = 'all';
+            filter['act']= 'SEARCH';
             break;
         case 'adm':
             filter['phone'] = $(objType+'phone').val();
             filter['reg_no'] = $(objType+'regno').val();
             filter['roll_no'] = $(objType+'rollno').val();
             filter['param'] = 'alladm';
+            filter['act']= 'SEARCH';
             break;
     }
     currentFilter = filter;
@@ -111,7 +113,7 @@ const setNoRecords = (nofRecords, selector) => {
     $(selector).text(nofRecords);    
 }
 //Filter Info
-
+/*
 const searchResult = (searchData, objType, elementSelector) => {
     let api = '';
     switch(objType) {
@@ -141,11 +143,11 @@ const searchResult = (searchData, objType, elementSelector) => {
                 });
             }
         },
-        fields:getGridColumns(objType)
+        fields:getSearchGridColumns(objType)
     });
 }
 
-const getGridColumns = (objectType) => {
+const getSearchGridColumns = (objectType) => {
     let columnDefinition = {};
     switch(objectType) {
         case 'leads':
@@ -182,7 +184,7 @@ const getGridColumns = (objectType) => {
     }
     return columnDefinition;
 }
-
+*/
 $('.leads-search').click(function(){
     let validationErrors = vaildateFilterData('leads');
     if (validationErrors.length) {
@@ -197,7 +199,7 @@ $('.leads-search').click(function(){
     currentFilterObject = 'leads';
     //renderGrid('.quotationGrid', getFilterData());
     //console.log(getFilterData('leads'));
-    searchResult(getFilterData('leads'),'leads','.searchResultLeads');
+    searchResult(getSearchFilterData('leads'),'leads','.searchResultLeads');
 });
 
 $('.adm-offer-filter').click(function(){
@@ -214,7 +216,7 @@ $('.adm-offer-filter').click(function(){
     currentFilterObject = 'adm';
     //renderGrid('.quotationGrid', getFilterData());
     //console.log(getFilterData('adm'));
-    searchResult(getFilterData('adm'),'adm','.searchResultAdm');
+    searchResult(getSearchFilterData('adm'),'adm','.searchResultAdm');
 });
 
 $('.leads-reset-filter').click(function(){

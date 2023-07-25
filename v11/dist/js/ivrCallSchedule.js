@@ -47,37 +47,6 @@ $(".branchList").change(function(){
         });
 });
 
-// Filter
-const getFilterData = (objType) => {
-    let strType = objType;
-    objType = '#' + objType + '-';
-    let filter = new Object();
-    filter['from_date'] = $(objType+'fromDate').val();
-    filter['to_date'] = $(objType+'toDate').val();
-    filter['branch'] = $(objType+'branchList').find(":selected").val();
-    filter['emp'] = ($(objType+'empList').find(":selected").val() == 'Filter By Employee')?'':$(objType+'empList').find(":selected").val();
-    filter['phone'] = $(objType+'phone').val();
-    filter['status'] = $(objType+'status').find(":selected").val();
-    if (strType == 'adm') {
-        filter['credit_amt'] = $(objType+'credit-amt').val();
-    }
-    currentFilter = filter;
-    return filter;
-}
-
-const resetFilterForm = (objType) => {
-    objType = '#' + objType + '-';
-    let filter = new Object();
-    filter['from_date'] = $(objType+'fromDate').val('');
-    filter['to_date'] = $(objType+'toDate').val('');
-    filter['branch'] = $(objType+'branchList option:eq(1)').prop('selected', true);
-    //filter['emp'] = ($(objType+'empList').find(":selected").val() == 'Filter By Employee')?'':$(objType+'empList').find(":selected").val();
-    filter['emp'] = $(objType+'branchList option:eq(0)').prop('selected', true);
-    filter['phone'] = $(objType+'phone').val('');
-    filter['status'] = $(objType+'empList option:eq(0)').prop('selected', true);
-    return filter;
-}
-
 //Filter Info
 const hideDisplayFilterResultBox = (objType) => {
     objType = '.' + objType + '-';
@@ -123,14 +92,14 @@ $('.leads-offer-filter').click(function(){
     currentFilterObject = 'leads';
     //renderGrid('.quotationGrid', getFilterData());
     //console.log(getFilterData('leads'));
-    getFilterSql(getFilterData('leads'),'leads');
+    getFilterSql(getSearchFilterData('leads'),'leads');
 });
 
 $('.adm-offer-filter').click(function(){
     currentFilterObject = 'adm';
     //renderGrid('.quotationGrid', getFilterData());
     //console.log(getFilterData('adm'));
-    getFilterSql(getFilterData('adm'),'adm');
+    getFilterSql(getSearchFilterData('adm'),'adm');
 });
 
 $('.leads-reset-filter').click(function(){

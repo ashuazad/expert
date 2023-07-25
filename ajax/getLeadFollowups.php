@@ -6,13 +6,28 @@ require_once '../includes/managebranchDatabase.php';
 require_once '../includes/db.php';
 require_once '../includes/student.php';
 require_once '../v11/lib/utilities.php';
- session_start();
+require_once '../includes/userPermissions.php';
+session_start();
 if(empty($_SESSION['id'])){
    header('Location: ' . constant('BASE_URL'));
    exit;
 }
 $id = $_SESSION['id'];
 //$id = 34;
+$whereUserIdCheck = " AND AF.emp_id = '".$id."'";
+//Checking for the Superadmin and Employee and Permission search_leads_admissions
+switch ($_SESSION['USER_TYPE']) {
+    case 'SUPERADMIN' :
+            $whereUserIdCheck = ""; 
+            $isPermissionEnable = true;
+        break;
+    case 'EMPLOYEE':
+            $empPermission = new userPermissions($id);
+            if ($empPermission->userPermission['search_leads_admissions']) {
+                $whereUserIdCheck = "";
+            }
+        break;
+}
 $userquery = new userqueryDatabase();
 $category = new categoryDatabase();
 $branchData = new managebranchDatabase();
@@ -35,6 +50,6 @@ if(!empty($data['leadId']) && isset($data['leadId']) || (strlen($data['leadId'])
 $norows = $_GET['r'];
 $sqlLimit = (isset($norows) && !empty($norows))?' Limit 0, '.$norows :'';
 
-$resultData = $dbObj->getData($columns,'user_query AF, login_accounts LA'," (AF.emp_id = LA.id) AND AF.lead_id = '" . $leadId . "' AND AF.emp_id = '".$id."' ORDER BY followup_date DESC " . $sqlLimit);
+$resultData = $dbObj->getData($columns,'user_query AF, login_accounts LA'," (AF.emp_id = LA.id) AND AF.lead_id = '" . $leadId . "'" .$whereUserIdCheck." ORDER BY followup_date DESC " . $sqlLimit);
 array_shift($resultData);
 echo json_encode($resultData);

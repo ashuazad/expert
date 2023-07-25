@@ -11,6 +11,7 @@ require_once '../includes/useraccountDatabase.php';
 require_once '../includes/db.php';
 require_once '../v11/lib/utilities.php';
 require_once '../includes/userPermissions.php';
+require_once '../includes/functions.php';
  session_start();
 if(!$_SESSION['id']){
    header('Location: ' . constant('BASE_URL'));
@@ -34,7 +35,8 @@ $column = array(
     "IF(next_followup_date='0000-00-00 00:00:00' OR next_followup_date IS NULL, 'NONE', DATE_FORMAT(next_followup_date , ".DATE_FORMAT.")) next_followup_date",
     "CONVERT(IFNULL(message,'NONE') USING utf8) as message",
     "status", "ip", "CONVERT(address USING utf8) as address",
-    "phone_location"
+    "phone_location",
+    "phone AS phone_full"
 );
 /*$column = array(
     "name","email","CONVERT(CONCAT( LEFT(TRIM(phone),3),'*****',SUBSTR(TRIM(phone),LENGTH(TRIM(phone))-1,2)) USING utf8) AS phone"
@@ -53,7 +55,13 @@ if (isset($_GET['param']) && !empty($_GET['param'])) {
                 break;
             case 'EMPLOYEE':
                     $empPermission = new userPermissions($id);
+                    // Check search lead and admission permission
                     if ($empPermission->userPermission['search_leads_admissions']) {
+                        $where = "";
+                        $isPermissionEnable = true;
+                    }
+                    // Check send lead and admission permission
+                    if ($empPermission->userPermission['send_leads_admissions']) {
                         $where = "";
                         $isPermissionEnable = true;
                     }
@@ -79,8 +87,18 @@ if (isset($_GET['param']) && !empty($_GET['param'])) {
                 case 'status':
                     $search .= "(status LIKE '%" . $searchValue . "%') AND ";
                     break;
+                case 'branch':
+                    $search .= "(branch_id = '" . $searchValue . "') AND ";
+                    break;
+                case 'emp':
+                    $search .= "(branch_id = '" . $_GET['branch'] . "' AND emp_id = '" . $searchValue . "') AND ";
+                    break;
             }
         }
+    }
+
+    if (isset($_GET['from_date']) && !empty($_GET['from_date']) && isset($_GET['to_date']) && !empty($_GET['to_date'])) {
+        $search.=" (create_date  >= '".$_GET['from_date']." 00:00:00' AND create_date <= '".$_GET['to_date']." 23:59:59') AND ";    
     }
 
 }
@@ -115,15 +133,20 @@ if(isset($_GET['param']) && !empty($_GET['param'])){
             $searchWhere = $where." AND (status != 'Start') order by last_follow_up desc";
             break;
         case 'all':
-            $searchWhere = $where." order by last_follow_up desc";
+            $searchWhere = $where." order by create_date desc";
+            $column[] = "(SELECT count(status) noStatus FROM user_query uq WHERE uq.lead_id = id and uq.status = 'Dead') AS NO_DEAD";
+            $column[] = 'DATE_FORMAT(create_date , '.DATE_TIME_FORMAT.') created_date';    
+            $column[] = 'hits';
+            $column[] = 'r_status';
+            $column[] = 'emp_id';
             break;    
         default:
             break;
     }
     if ($isPermissionEnable) {
-        $column[] = '(SELECT CONCAT(first_name,last_name) FROM login_accounts WHERE id = emp_id) AS lead_emp_name';    
+        $column[] = '(SELECT first_name FROM login_accounts WHERE id = emp_id) AS lead_emp_name';    
     }
-    $column[] = ($param == 'all')?' INSERT(phone, 4, 4, "****") AS phone':'phone';
+    $column[] = ($param == 'all')?' phone':' INSERT(phone, 4, 4, "****") AS phone';
     //echo $searchWhere;
     if($searchWhere){
         $admsAry=$dbObj->getData($column,"leads l", $searchWhere);
@@ -132,3 +155,26 @@ if(isset($_GET['param']) && !empty($_GET['param'])){
 array_shift($admsAry);
 //print_r($admsAry);
 echo json_encode($admsAry);
+switch (json_last_error()) {
+    case JSON_ERROR_NONE:
+        //echo ' - No errors';
+    break;
+    case JSON_ERROR_DEPTH:
+        echo ' - Maximum stack depth exceeded';
+    break;
+    case JSON_ERROR_STATE_MISMATCH:
+        echo ' - Underflow or the modes mismatch';
+    break;
+    case JSON_ERROR_CTRL_CHAR:
+        echo ' - Unexpected control character found';
+    break;
+    case JSON_ERROR_SYNTAX:
+        echo ' - Syntax error, malformed JSON';
+    break;
+    case JSON_ERROR_UTF8:
+        echo ' - Malformed UTF-8 characters, possibly incorrectly encoded';
+    break;
+    default:
+        echo ' - Unknown error';
+    break;
+    }

@@ -22,7 +22,7 @@ $where = '1=1 ';
 $userType = null;
 
 $userType = (isset($_SESSION['USER_TYPE']) && !empty($_SESSION['USER_TYPE']))?$_SESSION['USER_TYPE']:null;
-//var_dump($userType);
+//exit();
 //Check user type and according to that applying the restrictions
 switch ($userType){
     case 'SUPERADMIN':
@@ -38,7 +38,7 @@ switch ($userType){
         }
         if (strlen($empPermission->userPermission['view_branch_admissions'])>0) {
             $isPermissionEnable = true;
-           $strPermissionCondition .= " (branch_name IN ('".str_replace("','",',',$empPermission->userPermission['view_branch_admissions'])."'))";
+           $strPermissionCondition .= " OR (branch_name IN ('".implode("', '",explode(',',$empPermission->userPermission['view_branch_admissions']))."'))";
         }
         $where = " emp_id = ".$id;
         if (strlen($strPermissionCondition) > 0) {
@@ -53,7 +53,7 @@ switch ($userType){
 if (!$loadDeadAdmissions) {
     $where .= " AND fee_status NOT IN('Dead') ";
 }
-
+print_r($empPermission->userPermission);
 $query = "SELECT 
             (SELECT count(*) FROM admission WHERE ".$where." AND (next_due_date = '".date('Y-m-d')."' AND due_fee > 0)) AS TODAY_PENDING,
             (SELECT count(*) FROM admission WHERE ".$where." AND (next_due_date <= '".date('Y-m-d')."' AND due_fee > 0)) AS ALL_PENDING,
@@ -61,4 +61,6 @@ $query = "SELECT
             (SELECT count(*) FROM admission WHERE ".$where." AND ((total_fee-due_fee) < 2000)) AS ALL_BOOKING
           FROM  
             DUAL";
+//echo    $query;
+//exit();
 echo json_encode(mysql_fetch_assoc(mysql_query($query)));
