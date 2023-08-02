@@ -174,10 +174,7 @@ function items(item)
             tdInner = '<td><span class="followupAdm" id="name-'+item.id+'" data-row="'+item.id+'" style="cursor:pointer;" data-toggle="modal" data-target="#grid-modal">'+item.name+'</span></td>';
             return tdInner;
         }, css :"gird-cell-text-alignment" };
-    itemsList['phone'] = { name: "phone", title: "Phone", type: "text", width: 100, cellRenderer:function (value, item) {
-            var phoneText = value[0]+value[1]+'*****'+value[value.length-3]+value[value.length-2]+value[value.length-1];
-            return '<td>' + phoneText + '</td>';
-        }, css :"gird-cell-text-alignment"};
+    itemsList['phone'] = { name: "phone", title: "Phone", type: "text", width: 100, css :"gird-cell-text-alignment"};
     itemsList['message'] = { name: "message", title: "Remark", type: "text", width: 140, cellRenderer:function (value, item) {
             var moretxtRemark = (item.message.length>22)?'...':'';
             var toltipAttr = 'data-toggle="tooltip" data-placement="top" title="'+item.message+'"';
@@ -637,10 +634,7 @@ function renderDueFeeGrid(elementSel, gridInfo){
                     tdInner = '<td><span class="followupAdmDueFee" data-regno="'+item.regno+'" data-row="'+item.a_id+'" style="cursor:pointer;" data-toggle="modal" data-target="#grid-modal-due-fee">'+item.name+'</span></td>';
                     return tdInner;
                 }, css :"gird-cell-text-alignment"  },
-            { name: "phone", title: "Phone", type: "text", width: '10%',cellRenderer:function (value, item) {
-                var phoneText = value[0]+value[1]+'*****'+value[value.length-3]+value[value.length-2]+value[value.length-1];
-                return '<td>' + phoneText + '</td>';
-            }, css :"gird-cell-text-alignment" },
+            { name: "phone", title: "Phone", type: "text", width: '10%',css :"gird-cell-text-alignment" },
             { name: "courses", title: "Courses", type: "text", width: '14%', css :"gird-cell-text-alignment" },
             { name: "total_fee", title: "Total Fee", type: "text", width: '9%', css :"gird-cell-text-alignment"  },
             { name: "credit_amt", title: "Credit Fee", type: "text", width: '9%', css :"gird-cell-text-alignment"  },

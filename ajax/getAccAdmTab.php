@@ -23,11 +23,13 @@ $posted = json_decode(file_get_contents('php://input'),1);
 $isPermissionEnable = false;
 //echo json_encode($data);
 $column = array(
-            "a_id", "regno", "roll_no", "name", "phone", "REPLACE(REPLACE(course,'-',' '),'+',', ') AS courses", "total_fee", "due_fee", 
+            "a_id", "regno", "roll_no", "name", "REPLACE(REPLACE(course,'-',' '),'+',', ') AS courses", "total_fee", "due_fee", 
             "DATE_FORMAT( doj , '%d-%m-%y') admDate",
             "DATE_FORMAT( next_due_date , '%d-%c-%y') dueDate",
             "(total_fee-due_fee) AS credit_amt",
-            "IF(message='',followup_remark,message) AS message"
+            "IF(message='',followup_remark,message) AS message",
+            "phone AS phone_full",
+            ' INSERT(phone, 4, 4, "****") AS phone'
             );
 
 $strPermissionCondition = ''; 
@@ -38,7 +40,7 @@ if (strlen($empPermission->userPermission['view_emp_admissions'])>0) {
 }
 if (strlen($empPermission->userPermission['view_branch_admissions'])>0) {
     $isPermissionEnable = true;
-    $strPermissionCondition .= " OR (branch_name IN ('".str_replace("','",',',$empPermission->userPermission['view_branch_admissions'])."'))";
+    $strPermissionCondition .= " (branch_name IN ('".str_replace("','",',',$empPermission->userPermission['view_branch_admissions'])."'))";
 }
 $where = " emp_id = ".$id;
 

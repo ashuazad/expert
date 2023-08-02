@@ -13,6 +13,7 @@ if (!$_SESSION['id']) {
 }
 
 $id = $_SESSION['id'];
+//print_r($_SESSION);
 $categoryObj = new categoryDatabase();
 $user_query = new userqueryDatabase();
 $manage_branchObj = new managebranchDatabase();
@@ -29,6 +30,7 @@ $ip_address = $_SERVER['REMOTE_ADDR'];
 $postData['ip']=$ip_address;
 $postData['assingment_data'] = date("Y-m-d");
 $postData['source']='CRM';
+$postData['branch_id']=$_SESSION['user_details']['branch_id'];
 
 if(strlen($postData['phone']) == 10){
     $postData['phone_location'] = file_get_contents("https://www.advanceinstitute.co.in/getLocation.php?phone=".$postData['phone']);
@@ -45,10 +47,12 @@ if( $chekLed[0]>0 ){
 }else{
     $addedLeadid = $dbObj->dataInsert($postData,"leads");
     $fwrLeadData = array();
-    $fwrLeadData['lead_id']     = $addedLeadid;
+    $fwrLeadData['object_id']   = $addedLeadid;
+    $fwrLeadData['object_type'] ='LEAD';
     $fwrLeadData['currentId']   = $id;
     $fwrLeadData['nextId']      = $id;
     $fwrLeadData['frwDate']     = date("Y-m-d H:i:s");
+    $fwrLeadData['modified_by'] = $id;
     $fwrLeadId = $dbObj->dataInsert($fwrLeadData,"leadfrwdhistory");
     $dbObj->dataupdate( array("frwId"=>$fwrLeadId), 'leads' , "id", $addedLeadid);
 }

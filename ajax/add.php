@@ -339,7 +339,7 @@ $dateSendLd = date('Y-m-d H:i:s');
    //print_r($select );
     for($i = 0; $i <= count($select)-1;$i++){
       $dataEmpId = mysql_fetch_array( mysql_query("select emp_id,status from leads where id = $select[$i]" ) );
-      mysql_query("insert into leadfrwdhistory values( NULL , ".$select[$i]." ,".$dataEmpId['emp_id']." , $emp , '$dateSendLd' )");
+      mysql_query("insert into leadfrwdhistory values( NULL , ".$select[$i]." ,'LEAD',".$dataEmpId['emp_id']." , $emp , '$dateSendLd', $id )");
       $lastIntId = mysql_insert_id();
 if($dataEmpId['status'] == 'Dead'){
         $update = "update leads set branch_id = '".$brnchId[0]."' ,emp_id = '$emp' ,status='Active', r_status=1 , assingment_data = '".$dateSendLd ."',frwId=$lastIntId,message=NULL ,last_follow_up = '0000-00-00',next_followup_date  ='0000-00-00',hits=0  where id = '".$select[$i]."'";

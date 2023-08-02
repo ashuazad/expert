@@ -34,7 +34,19 @@ $updateCol = array(
                     'followup_remark' => ''
                 );
 foreach ($select as $eachAdmId) {
-    $dbObj->dataupdate($updateCol,'admission','a_id',$eachAdmId);
+    $currentDetails = $dbObj->getData(array('emp_id'),'admission',"a_id=$eachAdmId");
+    array_shift($currentDetails);
+    $arr_data = array(
+        'object_id' => $eachAdmId,
+        'object_type' => 'ADMISSION',
+        'currentId' => $currentDetails[0]['emp_id'],
+        'nextId' => $posted_emp_id,
+        'frwDate' => date('Y-m-d H:i:s'),
+        'modified_by' => $id
+    );
+    $dbObj->dataInsert($arr_data, 'leadfrwdhistory');
+   // mysql_query("insert into leadfrwdhistory values( NULL , ".$select[$i]." ,'LEAD',".$dataEmpId['emp_id']." , $emp , '$dateSendLd', $id )");
+    $dbObj->dataupdate($updateCol, 'admission', 'a_id', $eachAdmId);
 }
 echo json_encode(array('success'=>true));
 //echo json_encode(mb_convert_encoding($admsAry, "UTF-8", "UTF-8"));

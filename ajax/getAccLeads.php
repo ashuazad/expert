@@ -116,21 +116,26 @@ if(isset($_GET['param']) && !empty($_GET['param'])){
         case 'todaypending':
             $searchWhere = $where." AND ((status not in('Start','Complete','Dead')  and date(next_followup_date)='".$today."' and emp_id=".$id." ) 
           OR (DATE(assingment_data) = '".$today."' AND Message IS NULL AND emp_id=".$id." )) order by l.next_followup_date desc, l.hits desc";
+          $column[] = ' INSERT(phone, 4, 4, "****") AS phone';
             break;
         case 'allpending':
             $searchWhere = $where." AND ((status not in('Start','Complete','Dead')  and date(next_followup_date)<='".$today."' and emp_id=".$id." ) 
           OR (DATE(assingment_data) <= '".$today."' AND Message IS NULL AND emp_id=".$id.")) order by l.next_followup_date desc, l.hits desc";
+          $column[] = ' INSERT(phone, 4, 4, "****") AS phone';
             break;
         case 'todaynew':
             $searchWhere = " emp_id = ".$id." AND (frwId > 0 AND message IS NULL) AND DATE(assingment_data) ='".$today."'";
+            $column[] = ' INSERT(phone, 4, 4, "****") AS phone';
             break;
         case 'todaydone':
             $column[] = "DATE_FORMAT((SELECT followup_date FROM user_query WHERE lead_id = l.id ORDER BY followup_date DESC limit 0,1),".DATE_TIME_FORMAT.") AS last_followup_date";
             $todaydoneWhere = "(SELECT lead_id FROM user_query WHERE emp_id = ".$id." AND date(followup_date) = '".date('Y-m-d')."')";
             $searchWhere = "id IN(".$todaydoneWhere.") order by last_follow_up desc";
+            $column[] = ' INSERT(phone, 4, 4, "****") AS phone';
             break;
         case 'allStatus':
             $searchWhere = $where." AND (status != 'Start') order by last_follow_up desc";
+            $column[] = ' INSERT(phone, 4, 4, "****") AS phone';
             break;
         case 'all':
             $searchWhere = $where." order by create_date desc";
@@ -139,6 +144,8 @@ if(isset($_GET['param']) && !empty($_GET['param'])){
             $column[] = 'hits';
             $column[] = 'r_status';
             $column[] = 'emp_id';
+            $actionList_Phone_Mask = array('SEARCH');
+            $column[] = (in_array($_GET['act'],$actionList_Phone_Mask)) ?' INSERT(phone, 4, 4, "****") AS phone':'phone';
             break;    
         default:
             break;
@@ -146,7 +153,7 @@ if(isset($_GET['param']) && !empty($_GET['param'])){
     if ($isPermissionEnable) {
         $column[] = '(SELECT first_name FROM login_accounts WHERE id = emp_id) AS lead_emp_name';    
     }
-    $column[] = ($param == 'all')?' phone':' INSERT(phone, 4, 4, "****") AS phone';
+    //$column[] = ($param == 'all')?' phone':' INSERT(phone, 4, 4, "****") AS phone';
     //echo $searchWhere;
     if($searchWhere){
         $admsAry=$dbObj->getData($column,"leads l", $searchWhere);
