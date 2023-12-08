@@ -422,7 +422,7 @@ border:#000 1px solid;
                                                       <a class="isw-settings" href="#"></a>
                                                       <ul class="dd-list">
                                                              <li><a href="javascript:void(0);" class="edit_details" ><span class="isw-edit"></span>Edit</a></li>                                    
-                                 
+                                                             
                                                       </ul>
                                                   </li>
                                                 </ul>
@@ -461,7 +461,8 @@ border:#000 1px solid;
 
                                                     <div class="span3">Phone No :</div>
 
-                                                    <div class="span3 show_phone"><?php echo $resultLead['phone']; ?></div>
+                                                    <div class="span3 show_phone call-phone-no"><?php echo trim($resultLead['phone']); ?></div>
+                                                    <div class="span3 show_phone"><button class="btn btn-info call-now-btn">Call Now</button></div>
                                                     <div class="span3 edit_phone" style="display:none;"><input type="text" style="width:200px;"  value="<?php echo $resultLead['phone']; ?>" readonly></div>
 
                                                     <div class="clear"></div>   
@@ -934,6 +935,7 @@ $("#getRemTxt").click(function(){
                 <script>
            
                     $(document).ready(function(){
+                        var currentTime = new Date().getTime();
                         $('.edit_details').click(function(){
                             $('.show_name').hide();
                             $('.edit_name').show();
@@ -987,6 +989,20 @@ $("#getRemTxt").click(function(){
 
                         $.ajax(settings).done(function (response) {
                             console.log(response);
+                        });
+
+                        $('.call-now-btn').click(function(){
+                            //$(this).hide('fast');
+                            $.ajax({
+                                url:  '../ajax/callNowApi.php?_=' + currentTime + '&phone=' + $('.call-phone-no').text(),
+                                type : 'GET',
+                                contentType : 'application/json',
+                                dataType:'json',
+                                data:JSON.stringify({}),
+                                success : function( data ){
+                                    alert('Call has been successfully made.');
+                                }
+                            });
                         });
                     });
                 </script>

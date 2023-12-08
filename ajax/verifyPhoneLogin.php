@@ -51,6 +51,7 @@ if (!count($errors)) {
             $query = "SELECT phone_no FROM superadmin WHERE phone_no='".$phone_no."'";
             $resultLogin = mysql_query($query);
             if (mysql_num_rows($resultLogin)) {
+                $userDetails = mysql_fetch_assoc($resultLogin);
             }
             break;
         case 'EMPLOYEE':
@@ -58,6 +59,7 @@ if (!count($errors)) {
             $resultLogin = mysql_query($query);
             if (mysql_num_rows($resultLogin)) {
                 $isValidPhone = true; 
+                $userDetails = mysql_fetch_assoc($resultLogin);
             }
             break;
         default:
@@ -76,6 +78,7 @@ if ($isValidPhone && ($_SESSION['OTP']==$otp)) {
     $result['type'] = $type;
     $_SESSION['OTP_C'] = 1;
     $_SESSION['OTPtry'] = $_SESSION['OTPtry']+1;
+    $_SESSION['user_details']['phone_no'] = $userDetails['phone_no'];
     unset($_SESSION['OTP']);
     //unset($_SESSION['USER_TYPE']);
     unset($_SESSION['verifyPhone']);

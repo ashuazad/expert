@@ -585,10 +585,11 @@ if (!$_SESSION['id']) {
                                     <div class="modal-dialog modal-dialog-centered modal-lg">
                                         <div class="modal-content">
                                             <div class="modal-header lead-edit">
-                                                <h4 class="modal-title lead-name lead-edit-row" id="grid-title">Name</h4>
+                                                <h4 class="modal-title lead-name lead-edit-row m-t-5" id="grid-title">Name</h4>
                                                 <div class="controls">
                                                     <input type="text" class="form-control lead-name-field" name="name">
                                                 </div>
+                                                <button type="button" class="btn btn-success call-now-btn m-l-5" data-phone="" href="javascript:void(0);">Call Now <i class="fas fa-phone m-l-5"></i></button>
                                                 <button type="button" class="btn btn-dark quotation-button" data-toggle="tab" href="#quotation" role="tab">Send PDF</button>
                                                 <button type="button" class="close" style="margin-left:2rem" data-dismiss="modal" aria-hidden="true">×</button>
                                             </div>

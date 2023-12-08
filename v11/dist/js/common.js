@@ -2,6 +2,7 @@ var isRemark = true;
 var currentTime = new Date().getTime();
 var lastFollowUpId = null;
 var searchDataSet = {};
+var currentFilter = {};
 function getFollowUpdata(aId)
 {
     var data = {};
@@ -58,7 +59,7 @@ function clearErrors(elementObj)
 function setFollowupsHeading(data)
 {
     $('.adm-name').html(data.name);
-    $('.adm-phone').html(data.phone_full);
+    $('.adm-phone').html(data.phone_full?data.phone_full:data.phone);
     $('.adm-total-fees').html(data.total_fee);
     $('.adm-credit-fees').html(data.credit_amt);
     $('.adm-due-fees').html(data.due_fee);

@@ -26,28 +26,17 @@ $result['success'] = false;
 $result['errors'] = $errors;
 $postedData = json_decode(file_get_contents('php://input'), true);
 $apiClass = array('WHATSUP','CALL','SMS');
-$type = 'LOGIN_OTP';
 $id = trim($postedData['id']);
-//$smsDetails = $dbObj->getData(array('1'),'sms_api', "id = '".$id."'");
-$apiDetails = $commObj->validateAPI($id);
-if (!in_array($postedData['className'], $apiClass)) {
-    $errors[] = 'Invalid API Class';
-}
-if ($apiDetails[0] == 0) {
-    $errors[] = 'SMS API Not Found';
+$apiDetails = $dbObj->getData(array('status'),'auto_fill_apis', "id = '".$id."'");
+if ($apiDetails[0]==0) {
+    $errors[] = 'API Not Found';
 }
 if (!count($errors)) {
-    if ($postedData['status'] && in_array($apiDetails[1]['type'], array('IVR_CALL','CALL_NOW'))) {
-        $resultUpdate = $commObj->markDefaultPerType($id, $apiDetails[1]['type']);
-        $updateData = array('api'=>$postedData['api'],'class' => $postedData['className'], 'status' => $postedData['status']);
-        $resultUpdate = $dbObj->dataupdate($updateData, 'sms_api', "id", $id);
-    } else {
-        $updateData = array('api'=>$postedData['api'],'class' => $postedData['className'], 'status' => $postedData['status']);
-        $resultUpdate = $dbObj->dataupdate($updateData, 'sms_api', "id", $id);
-    }
+        $updateData = array('status' => ($apiDetails[1]['status'] == '1')?'0':'1');
+        $resultUpdate = $dbObj->dataupdate($updateData, 'auto_fill_apis', "id", $id); 
     if ($resultUpdate) {
         $result['success'] = true;
-        $result['id'] = $resultUpdate;
+        $result['id'] = $id;
     }
 }
 $result['errors'] = $errors;

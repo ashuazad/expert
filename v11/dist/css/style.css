@@ -22236,3 +22236,16 @@ File: scss
 .search-lead-assigned, .search-lead-once-dead, .search-lead-multi-dead, .search-lead-exists > td {
   font-weight:normal !important;
 }
+
+.order-box-header {
+  color: #000000;
+  font-weight: 600;
+}
+
+.payment-form-wizard {
+  overflow:visible !important;
+}
+
+.shop-order-details-cell{
+  padding: 6px 0px 6px 0px !important;
+}

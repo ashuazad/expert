@@ -17,17 +17,23 @@ $branchData = new managebranchDatabase();
 $dbObj=new db();
 $studentObj = new student();
 $today=date('ymd');
-$api_type = array(
-   'login' => 'LOGIN_OTP',
-   'due' => 'DUE_FEES',
-   'ivr' => 'IVR_CALL',
-   'callnow' => 'CALL_NOW'
-);
-$current_api_type = $api_type['login'];
-if (isset($_GET['type'])) {
-   $current_api_type = $api_type[trim($_GET['type'])];
+
+$errors = array();
+$result = array();
+$result['success'] = false;
+$result['errors'] = $errors;
+$postedData = json_decode(file_get_contents('php://input'), true);
+$id = trim($postedData['id']);
+$smsDetails = $dbObj->getData(array('id'),'auto_fill_apis', "id = '".$id."'");
+if ($smsDetails[0] == 0) {
+    $errors[] = 'API Not Found';
 }
-$columnList = array('id as ID','api AS API','status AS STATUS','class AS CLASS','type AS TYPE');
-$smsList = $dbObj -> getData($columnList, 'sms_api' , "type = '" . $current_api_type . "' AND class IN ('WHATSUP','CALL','SMS')");
-array_shift($smsList);
-echo json_encode($smsList);
+if (!count($errors)) {
+    $resultDelete = $dbObj->delOne('auto_fill_apis', "id", $id);
+    if ($resultDelete) {
+        $result['success'] = true;
+        $result['id'] = $id;
+    }
+}
+$result['errors'] = $errors;
+echo json_encode($result);

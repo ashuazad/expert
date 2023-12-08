@@ -5,7 +5,9 @@ require_once '../includes/categoryDatabase.php';
 require_once '../includes/managebranchDatabase.php';
 require_once '../includes/db.php';
 require_once '../includes/student.php';
- session_start();
+require_once '../includes/communication.php';
+require_once '../includes/functions.php';
+session_start();
 if(empty($_SESSION['id'])){
    header('Location: ' . constant('BASE_URL'));
    exit;
@@ -16,18 +18,16 @@ $category = new categoryDatabase();
 $branchData = new managebranchDatabase();
 $dbObj=new db();
 $studentObj = new student();
+$commObj = new communication();
 $today=date('ymd');
-$api_type = array(
-   'login' => 'LOGIN_OTP',
-   'due' => 'DUE_FEES',
-   'ivr' => 'IVR_CALL',
-   'callnow' => 'CALL_NOW'
-);
-$current_api_type = $api_type['login'];
-if (isset($_GET['type'])) {
-   $current_api_type = $api_type[trim($_GET['type'])];
-}
-$columnList = array('id as ID','api AS API','status AS STATUS','class AS CLASS','type AS TYPE');
-$smsList = $dbObj -> getData($columnList, 'sms_api' , "type = '" . $current_api_type . "' AND class IN ('WHATSUP','CALL','SMS')");
-array_shift($smsList);
-echo json_encode($smsList);
+
+$errors = array();
+$result = array();
+$result['success'] = false;
+$result['errors'] = $errors;
+$postedData = json_decode(file_get_contents('php://input'), true);
+$jobStatus = $dbObj->getData(array('object_type','created_date','no_of_records','no_of_completed','status'),"delayed_auto_fill_jobs");
+$result['errors'] = $errors;
+$result['success'] = true;
+$result['data'] = $jobStatus;
+echo json_encode($result);

@@ -30,7 +30,8 @@ $apiClass = array('WHATSUP','CALL','SMS');
 $api_type = array(
     'login' => 'LOGIN_OTP',
     'due' => 'DUE_FEES',
-    'ivr' => 'IVR_CALL'
+    'ivr' => 'IVR_CALL',
+    'callnow' => 'CALL_NOW'
  );
 $current_api_type = $api_type['login'];
 if (isset($postedData['type'])) {
@@ -43,7 +44,7 @@ if (!in_array($postedData['className'],$apiClass)) {
 if (!count($errors)) {
     $insertData = array('api'=>$postedData['api'],'type'=>$current_api_type, 'class' => $postedData['className'], 'status' => $postedData['status']);
     $resultInsert = $dbObj->dataInsert($insertData, 'sms_api');
-    if ($postedData['status'] && ($current_api_type == $api_type['ivr'])) {
+    if ($postedData['status'] && in_array($apiDetails[1]['type'], array('IVR_CALL','CALL_NOW'))) {
         $resultInsert = $commObj->markDefaultPerType($resultInsert, $current_api_type);
     }
     if ($resultInsert) {

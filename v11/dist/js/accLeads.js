@@ -759,3 +759,19 @@ $("#addMessage").click(function() {
 $("#addRemark").click(function(){
     toggleRemarkMessage("#rowRemark", "#rowMessage", false);
 });
+
+//Call Now Api
+$('.call-now-btn').click(function(){
+        $(this).hide('fast');
+        $.ajax({
+            url: baseUrl + '/ajax/callNowApi.php?_=' + currentTime + '&phone=' + leadsRecords[recordId].phone_full,
+            type : 'GET',
+            contentType : 'application/json',
+            dataType:'json',
+            data:JSON.stringify({}),
+            success : function( data ){
+                Swal.fire('Call Now', 'Call has been successfully made.', "success"); 
+                $('.call-now-btn').show('fast');
+            }
+        });
+    });

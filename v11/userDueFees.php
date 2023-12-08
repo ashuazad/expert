@@ -426,6 +426,7 @@ if (!$_SESSION['id']) {
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h4 class="modal-title adm-name" id="grid-title">Name</h4>
+                                                <button type="button" class="btn btn-success call-now-btn m-l-5" data-phone="" href="javascript:void(0);">Call Now <i class="fas fa-phone m-l-5"></i></button>
                                                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                             </div>
                                             <div class="modal-header">

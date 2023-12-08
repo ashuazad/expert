@@ -16,18 +16,8 @@ $category = new categoryDatabase();
 $branchData = new managebranchDatabase();
 $dbObj=new db();
 $studentObj = new student();
-$today=date('ymd');
-$api_type = array(
-   'login' => 'LOGIN_OTP',
-   'due' => 'DUE_FEES',
-   'ivr' => 'IVR_CALL',
-   'callnow' => 'CALL_NOW'
-);
-$current_api_type = $api_type['login'];
-if (isset($_GET['type'])) {
-   $current_api_type = $api_type[trim($_GET['type'])];
-}
-$columnList = array('id as ID','api AS API','status AS STATUS','class AS CLASS','type AS TYPE');
-$smsList = $dbObj -> getData($columnList, 'sms_api' , "type = '" . $current_api_type . "' AND class IN ('WHATSUP','CALL','SMS')");
-array_shift($smsList);
-echo json_encode($smsList);
+
+$columnList = array('id as ID','api AS API','status AS STATUS');
+$apis = $dbObj -> getData($columnList, 'auto_fill_apis');
+array_shift($apis);
+echo json_encode($apis);
