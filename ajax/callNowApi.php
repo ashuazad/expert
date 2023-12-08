@@ -15,7 +15,7 @@ $userAccDb = new useraccountDatabase();
 $dbObj = new db();
 $phone_no = trim($_GET['phone']);
 $result = array();
-
+//print_r($_SESSION);
 switch($_SESSION['USER_TYPE']){
     case 'EMPLOYEE':
         $callerPhone = $_SESSION['user_details']['phone_no'];
